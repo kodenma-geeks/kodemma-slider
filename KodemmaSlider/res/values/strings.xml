@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ***** 文字列 ***** -->
+    
+    <string name="app_name">Slider Puzzle</string>
+    
+    <!-- *** BoardActivity *** -->
+    <string name="board_button_start">Start</string>
+    <string name="board_button_restart">Restart</string>
+    <string name="board_button_pause">Pause</string>
+    <string name="board_button_resume">Resume</string>
+    <string name="board_button_setting">Setting</string>
+    <string name="board_button_answer">Answer</string>
+    <string name="board_button_suspend">Suspend</string>
+</resources>

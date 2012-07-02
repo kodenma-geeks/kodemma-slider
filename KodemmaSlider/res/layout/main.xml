@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    >
+    <LinearLayout
+        android:id="@+id/linearTop"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        >
+        <TextView style="@style/normalText"
+            android:id="@+id/chronometer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#ffffff00"
+            android:text="00:00:00"
+            />
+        <TextView style="@style/normalText"
+            android:id="@+id/slideCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="#ffffffff"
+            android:text="000"
+            />
+    </LinearLayout>
+    
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="9"
+        android:background="#ff000000"
+        >
+        <kodemma.android.sliderpuzzle.BoardView
+            android:id="@+id/boardView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            />
+    </FrameLayout>
+    
+    <LinearLayout
+        android:id="@+id/linearBottom"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        >
+        <Button style="@style/normalButton"
+            android:id="@id/board_button_start"
+            android:text="@string/board_button_start"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+        <Button style="@style/normalButton"
+            android:id="@id/board_button_pause"
+            android:text="@string/board_button_pause"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+        <Button style="@style/normalButton"
+            android:id="@id/board_button_setting"
+            android:text="@string/board_button_setting"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+<!-- 
+        <Button style="@style/normalButton"
+            android:id="@id/board_button_answer"
+            android:text="@string/board_button_answer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+        <Button style="@style/normalButton"
+            android:id="@id/board_button_suspend"
+            android:text="@string/board_button_suspend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            />
+-->
+    </LinearLayout>
+</LinearLayout>
