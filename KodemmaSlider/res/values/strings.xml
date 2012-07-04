@@ -12,4 +12,20 @@
     <string name="board_button_setting">Setting</string>
     <string name="board_button_answer">Answer</string>
     <string name="board_button_suspend">Suspend</string>
+    
+    <!-- *** config resource *** -->
+    <string name="menu_exit">Exit</string>
+    <string name="config_title">Game Setting</string>
+    <string name="conf_level">Level Setting </string>
+    <string name="conf_hint">HINT On/Off</string>
+    <string name="conf_tile">TILE On/Off</string>
+    <string name="conf_pict">Select BackGround Picture</string>
+    <string name="str_confirm">Confirm</string>
+    <string name="str_ok">Ok</string>
+    <string name="str_cancel">Cancel</string>
+    <string-array name="ary_lv">
+        <item >Lv.1 ( 3 x 3 )</item>
+        <item >Lv.2 ( 4 x 4 )</item>
+        <item >Lv.3 ( 5 x 5 )</item>
+    </string-array>
 </resources>
