@@ -8,7 +8,7 @@ import android.util.*;
 enum Direction {UP, DOWN, LEFT, RIGHT, NON };
 
 class LogicalTile {
-	int serial;
+	int serial;				// 実番号より１少ない連番（０スタート）
 	Point lp = new Point(); // logical position
 	void setPoint(int x, int y) {
 		this.lp.x = x;
@@ -21,10 +21,10 @@ public class LogicalBoard {
 	private int totalDistance;
 	LogicalTile[][] tiles;
 	LogicalTile hole;
-	private int oldMove;
-	private LogicalTile tmp;
-	private LogicalTile newMove;
-	private ArrayList<Point> recode;		// ��
+//	private int oldMove;
+	private LogicalTile oldMove;			// 前回動かしたタイル
+	private LogicalTile newMove;			// 今回動かすタイル
+	private ArrayList<Point> recode;		// 棋譜
 	private int holeNumber;//shima
 //	int maxDistance;//shima
 //	int shuffleLimit;//shima
@@ -39,20 +39,21 @@ public class LogicalBoard {
 //		maxDistance = (int)(r * c * TWICE_VALUE);// shima
 //		shuffleLimit = (int)(maxDistance * LIMIT_VALUE);//shima
 
-		holeNumber = (int) (Math.random() * r * c + 1);	// �u�����N������
+		holeNumber = (int) (Math.random() * r * c + 1);	// ブランクを決定
 		
-		// �z�u�̏���
-		tiles = new LogicalTile[r][c];
+		// 配置の初期化
+		tiles = new LogicalTile[c][r];
 		int serial = 0;
-		for (int i = 0; i < c; i++) {
-			for (int j = 0; j < r; j++) {
+		for (int i = 0; i < r; i++) {
+			for (int j = 0; j < c; j++, serial++) {	// 注：X座標が内側のネスト
 				tiles[j][i] = new LogicalTile();
 				
 				tiles[j][i].setPoint(j,i);
-				tiles[j][i].serial = ++serial; // (0,0)�ɂ́u�P�v�̃^�C�������̂�++ 
+				tiles[j][i].serial = serial; 	// (0,0)には「０」のタイルが入る
 
-				if (serial == holeNumber) {		// �u�����N��R�t��
-					hole = tiles[j][i];
+				if (serial == holeNumber) {
+					hole = tiles[j][i];			// ブランクを紐付け
+					oldMove = hole;				// シャッフル１周目用に暫定保存
 				}
 			}
 		}
@@ -60,255 +61,185 @@ public class LogicalBoard {
 	
 	protected int shuffle() {
 		final float TWICE_VALUE = 2.0f;
-		final float LIMIT_VALUE = 2.5f;
+		final float LIMIT_VALUE = 5.5f;
 		
-//		ArrayList<Integer> tile;
 		ArrayList<LogicalTile> tile;
-		oldMove = 0;
-		 
-		// �V���b�t���J�n
+//		oldMove = -1;
+		
+		// シャッフル開始
 		for (int i = 0; i < (int)(row * column * TWICE_VALUE * LIMIT_VALUE); i++) {
 
-			System.out.println("\n"+ (i) + "��]");
-
-			// ������ǉ�
+			// 棋譜を一手追加
 			recode.add(new Point(hole.lp.x, hole.lp.y));
-			System.out.println("X "+ hole.lp.x + ",  Y" + hole.lp.y);
 
-//			tile = canMoveTileSelect(holeData.point);
 			tile = canMoveTileSelect();
 			/*
-			 * ���canMoveTileSelect���\�b�h����́A�O�񓮂������^�C���i���o�[������\��������̂�
-			 * ����for���ŁA�O��^�C����tile�z�񂩂�폜�B
+			 * 上のcanMoveTileSelectメソッドからは、前回動かしたタイルナンバーも来る可能性があるので
+			 * 下のfor文で、前回タイルをtile配列から削除。
 			 */
 			for (int j = 0; j < tile.size(); j++) {
-				if (oldMove == tile.get(j).serial) {
+				if (oldMove.serial == tile.get(j).serial) {
 					tile.remove(j);
 					break;
 				}
 			}
-			System.out.println(tile.size());
 
-			// �i��ꂽ���̒�����A�ǂ̃^�C���𓮂����������_���Ō���
+			// 絞られた候補の中から、どのタイルを動かすかランダムで決定
 			newMove = tile.get((int) (Math.random() * tile.size()));
 
-			oldMove = newMove.serial;
-			
-			System.out.println("Move.serial = " + newMove.serial);
-			System.out.println(getDirection(newMove));
+//			oldMove = newMove.serial;
 
-				// �f�o�b�O�p
-				debug(i,tile,oldMove);
+				// デバッグ用
+//				debug(i,tile);
 			
-			// �^�C��������
-//			tileChange(newMove);
-//			slide(newMove);
-			System.out.println(slide(newMove));
-			
+			// タイルを交換
+			slide(newMove);
+		
+			// シャッフル終了条件
 			if (totalDistance >= (int)(row * column * TWICE_VALUE)) {
 				break;
 			}
 		}
+		// 棋譜に最後の一手を追加
+		recode.add(new Point(hole.lp.x, hole.lp.y));
+
 		return recode.size();
 	}
 
-
-	// �u�����N�Ɨאڃ^�C������ւ���āA���U���������Z
-//	private void tileChange(LogicalTile newMove) {
-//		for (int i = 0; i < column; i++) {
-//			for (int j = 0; j < row; j++) {
-//				if (logicalTiles[i][j].serial == newMove.serial) {
-//					totalDistance -= getDistance(newMove, i, j);	// �O�񋗗�
-//
-//					logicalTiles[i][j].serial = holeData.serial;
-//					logicalTiles[holeData.point.x][holeData.point.y].serial = newMove;
-//
-//					totalDistance += getDistance(newMove, holeData.point.x, holeData.point.y);	// ���񋗗�
-//
-////					logicalTile[holeData.point.x][holeData.point.y].setPoint(holeData.point.x, holeData.point.y);
-//					holeData.setPoint(i, j);
-//					return;
-//				}
-//			}
-//		}
-//	}
-
-	// ���������Ƃ��\�ȗאڃ^�C���̔ԍ���z��ŕԂ����\�b�h
+	// 動かすことが可能な隣接タイルの番号を配列で返すメソッド
 	protected ArrayList<LogicalTile> canMoveTileSelect() {
 
 		ArrayList<LogicalTile> canMoveTiles = new ArrayList<LogicalTile>();
 
-		if (0 <= hole.lp.y && hole.lp.y < column) {	// �㉺�ɂ͂ݏo���Ȃ�������
-			if (hole.lp.x - 1 >= 0) {	// ������
+		if (0 <= hole.lp.y && hole.lp.y < row) {	// 上下にはみ出さない中から
+			if (hole.lp.x - 1 >= 0) {	// 左見て
 				canMoveTiles.add(tiles[hole.lp.x - 1][hole.lp.y]);
 			}
-			if (hole.lp.x + 1 < row) {	// �E����
+			if (hole.lp.x + 1 < column) {	// 右見て
 				canMoveTiles.add(tiles[hole.lp.x + 1][hole.lp.y]);
 			}
 		}
-		if (0 <= hole.lp.x && hole.lp.x < row) {	// ���E�ɂ͂ݏo���Ȃ�������
-			if (hole.lp.y - 1 >= 0) {	// �㌩��
+		if (0 <= hole.lp.x && hole.lp.x < column) {	// 左右にはみ出さない中から
+			if (hole.lp.y - 1 >= 0) {	// 上見て
 				canMoveTiles.add(tiles[hole.lp.x][hole.lp.y - 1]);
 			}
-			if (hole.lp.y + 1 < column) {	// ������
+			if (hole.lp.y + 1 < row) {	// 下見て
 				canMoveTiles.add(tiles[hole.lp.x][hole.lp.y + 1]);
 			}
 		}
 		return canMoveTiles;
 	}
-//	protected ArrayList<LogicalTile> canMoveTileSelect() {
-//
-//		ArrayList<LogicalTile> canMoveTiles = new ArrayList<LogicalTile>();
-//
-//		if (0 <= holeData.point.y && holeData.point.y < column) {	// �㉺�ɂ͂ݏo���Ȃ�������
-//			if (holeData.point.x - 1 >= 0) {	// ������
-//				canMoveTiles.add(logicalTiles[holeData.point.x - 1][holeData.point.y]);
-//			}
-//			if (holeData.point.x + 1 < row) {	// �E����
-//				canMoveTiles.add(logicalTiles[holeData.point.x + 1][holeData.point.y]);
-//			}
-//		}
-//		if (0 <= holeData.point.x && holeData.point.x < row) {	// ���E�ɂ͂ݏo���Ȃ�������
-//			if (holeData.point.y - 1 >= 0) {	// �㌩��
-//				canMoveTiles.add(logicalTiles[holeData.point.x][holeData.point.y - 1]);
-//			}
-//			if (holeData.point.y + 1 < column) {	// ������
-//				canMoveTiles.add(logicalTiles[holeData.point.x][holeData.point.y + 1]);
-//			}
-//		}
-//		return canMoveTiles;
-//	}
 
-	// ���U���������߂郁�\�b�h
-//	public int getDistance(int nm, int x, int y) {
-//		int distnc = Math.abs(nm / column - (x)) + Math.abs(nm % column - (y+1));
-//		return distnc;
-//	}
-	public int getDistance(LogicalTile nm) {
-		int distnc = (Math.abs((nm.serial-1) / row - nm.lp.y) + (Math.abs((nm.serial-1) % row - nm.lp.x)));
+	// 離散距離を求めるメソッド
+	public int getDistance(LogicalTile logTil) {
+		int distnc = (Math.abs(logTil.serial / column - logTil.lp.y)		// 縦座標のズレ
+				   + (Math.abs(logTil.serial % column - logTil.lp.x)));		// 横座標のズレ
 		return distnc;
 	}
 	
 	
-	// �V���\�b�h�@���Q�b�g
-	protected Direction getDirection(LogicalTile lt) {
+	// 新メソッド　方向ゲット
+	protected Direction getDirection(LogicalTile logTil) {
 		direction = Direction.NON;
-		if (hole.lp.y == lt.lp.y) {	// �㉺�ɕ��񂾗�̒�����
-			if (hole.lp.x > lt.lp.x) {	// ������
+		if (hole.lp.y == logTil.lp.y) {	// 上下に並んだ列の中から
+			if (hole.lp.x > logTil.lp.x) {	// 左見て
 				direction = Direction.RIGHT;
 			}
-			if (hole.lp.x < lt.lp.x) {	// �E����
+			if (hole.lp.x < logTil.lp.x) {	// 右見て
 				direction = Direction.LEFT;
 			}
 		}
-		if (hole.lp.x == lt.lp.x) {	// �㉺�ɕ��񂾗�̒�����
-			if (hole.lp.y > lt.lp.y) {	// �㌩��
+		if (hole.lp.x == logTil.lp.x) {	// 左右に並んだ列の中から
+			if (hole.lp.y > logTil.lp.y) {	// 上見て
 				direction = Direction.DOWN;
 			}
-			if (hole.lp.y < lt.lp.y) {	// ������
+			if (hole.lp.y < logTil.lp.y) {	// 下見て
 				direction = Direction.UP;
 			}
 		}
-		return direction;
+		return direction;	// デバッグ用に変数に入れてみたが、ifの中で直接returnしても良い
 	}
 	
-	// �V���\�b�h�@��������^�C�����X�g
-	protected List<LogicalTile> getMovables(LogicalTile lt) {
+	// 新メソッド　動かせるタイルリスト
+	protected List<LogicalTile> getMovables(LogicalTile logTil) {
 		List<LogicalTile> ltList = null;
 
-		if (hole.lp.y == lt.lp.y) {	// ���E�ɕ��񂾗�̒�����
-			int i = hole.lp.x < lt.lp.x ? 1: -1; // �E�������ŁAint i�̒l������
-			for(int x = hole.lp.x; lt.lp.x != x; ){ // �ǂ���̕��ł��P�����Ԃɏ���
+		if (hole.lp.y == logTil.lp.y) {	// 左右に並んだ列の中から
+			int i = hole.lp.x < logTil.lp.x ? 1: -1; // 右か左かで、int iの値を決定
+			for(int x = hole.lp.x; logTil.lp.x != x; ){ // どちらの方向でも１つずつ順番に処理
 				if(ltList == null)ltList = new ArrayList<LogicalTile>();
 				ltList.add(tiles[x += i][hole.lp.y]);
 			}
 		}
-		if (hole.lp.x == lt.lp.x) {	// �㉺�ɕ��񂾗�̒�����
-			int i = hole.lp.y < lt.lp.y ? 1: -1;
-			for(int y = hole.lp.y; lt.lp.y != y; ){
+		if (hole.lp.x == logTil.lp.x) {	// 上下も同様に
+			int i = hole.lp.y < logTil.lp.y ? 1: -1;
+			for(int y = hole.lp.y; logTil.lp.y != y; ){
 				if(ltList == null)ltList = new ArrayList<LogicalTile>();
 				ltList.add(tiles[hole.lp.x][y += i]);
 			}
 		}
 		return ltList;
 	}
-	
-	// �V���\�b�h�@�אڃ`�F�b�N
-	protected boolean slide(LogicalTile lt) {
-		if ((hole.lp.x == lt.lp.x && (Math.abs(hole.lp.y - lt.lp.y) == 1))
-		  ||(hole.lp.y == lt.lp.y && (Math.abs(hole.lp.x - lt.lp.x) == 1))){	// �אڂ��Ă��邩�H
+	// 新メソッド　隣接チェック　および　タイル入れ替え
+	protected boolean slide(LogicalTile logTil) {
+		if ((hole.lp.x == logTil.lp.x && (Math.abs(hole.lp.y - logTil.lp.y) == 1))	 // 横または
+		  ||(hole.lp.y == logTil.lp.y && (Math.abs(hole.lp.x - logTil.lp.x) == 1))){ // 縦に隣接しているか？
 			
-//			LogicalTile tmp;
-			
-			totalDistance -= getDistance(lt);	// �O�񋗗�
-			System.out.println("�O��@" + getDistance(lt));
+			totalDistance -= getDistance(logTil);	// 前回距離
 
-//			oldMove = lt;			
-//			lt = holeData;
-//			holeData = oldMove;
-//
-//			oldMove.point = lt.point;
-//			lt.point = holeData.point;
-//			holeData.point = oldMove.point;
+			// オブジェクトの入れ替え
+			oldMove = tiles[logTil.lp.x][logTil.lp.y];
+			tiles[logTil.lp.x][logTil.lp.y] = tiles[hole.lp.x][hole.lp.y];	
+			tiles[hole.lp.x][hole.lp.y] = oldMove;	// oldMoveは前回データとして次の周に参照するので保持
+			
+			LogicalTile pointTmp = new LogicalTile();
+		
+			// ポイントの入れ替え
+			pointTmp.lp = logTil.lp;
+			logTil.lp = hole.lp;
+			hole.lp = pointTmp.lp;
 
-			tmp = tiles[lt.lp.x][lt.lp.y];
-			tiles[lt.lp.x][lt.lp.y] = tiles[hole.lp.x][hole.lp.y];	
-			tiles[hole.lp.x][hole.lp.y] = tmp;
+//			tmp.lp = tiles[hole.lp.x][hole.lp.y].lp;
+//			tiles[hole.lp.x][hole.lp.y].lp = tiles[logTil.lp.x][logTil.lp.y].lp;
+//			tiles[logTil.lp.x][logTil.lp.y].lp = tiles[tmp.lp.x][tmp.lp.y].lp;
 			
-			tmp = new LogicalTile();
+//			tmp.lp = tiles[hole.lp.x][hole.lp.y].lp;
+//			tiles[logTil.lp.x][logTil.lp.y].lp = tiles[logTil.lp.x][logTil.lp.y].lp;
+//			tiles[tmp.lp.x][tmp.lp.y].lp = tiles[tmp.lp.x][tmp.lp.y].lp;
 			
-			tmp.lp = hole.lp;
-			tiles[hole.lp.x][hole.lp.y].lp = tiles[lt.lp.x][lt.lp.y].lp;
-			tiles[lt.lp.x][lt.lp.y].lp = tmp.lp;
-//			logicalTiles[lt.point.x][lt.point.y].point = logicalTiles[holeData.point.x][holeData.point.y].point;
-//			logicalTiles[holeData.point.x][holeData.point.y].point = tmp.point;
-//			holeData.serial = logicalTiles[holeData.point.x][holeData.point.y].serial;
-	
-			totalDistance += getDistance(lt);	// ���񋗗�
-			System.out.println("����@" + getDistance(lt));
+//			tmp.lp.set(hole.lp.x, hole.lp.y);
+//			tiles[lt.lp.x][lt.lp.y].lp.set(lt.lp.x, lt.lp.y);
+//			tiles[tmp.lp.x][tmp.lp.y].lp.set(tmp.lp.x, tmp.lp.y);
+
+			totalDistance += getDistance(logTil);	// 今回距離
 
 			return true;
 		}
 		return false;
 	}
-//	protected boolean slide(LogicalTile lt) {
-//		if (holeData.point.x == lt.point.x) {	// ���E�ɕ��񂾗�̒�����
-//			if (Math.abs(holeData.point.y - lt.point.y) == 1) {	// �אڂ��Ă��邩�H
-//				return true;
-//			}
-//		}
-//		if (holeData.point.y == lt.point.y) {	// �㉺�ɕ��񂾗�̒�����
-//			if (Math.abs(holeData.point.x - lt.point.x) == 1) {	// �אڂ��Ă��邩�H
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-	
-//	class ShuffleResalts {
-//		ArrayList<Point> recode = new ArrayList<Point>();
-//		int[][] logicalTiles;
-//		ShuffleResalts(int r, int c) {
-//			logicalTiles = new int[r][c];
-//		}
-//	}
 
-	// �f�o�b�O�p�O���b�h�\�����\�b�h
-	private void debug(int i, ArrayList<LogicalTile> tile, int nm) {
+
+	// デバッグ用グリッド表示メソッド
+	private void debug(int i, ArrayList<LogicalTile> tile) {
+		System.out.println("\n"+ (i) + "回転");
+
 		if(i==0){
-			Log.i("holeNumber", Integer.toString(hole.serial));
+			Log.i("holeNumber", Integer.toString(hole.serial +1));
 		}
 		for(int j = 0; j <tile.size();j++){
-			System.out.println("canMoveTile "+ tile.get(j).serial);
+			System.out.println("canMoveTile "+ (tile.get(j).serial +1));
 		}
-		for (int k = 0; k < column; k++) {
-			for (int j = 0; j < row; j++) {
-				if(tiles[j][k].serial < 10)System.out.print(" ");
-				System.out.print(" "+tiles[j][k].serial);
+		System.out.println("Move serialNomber is " + (newMove.serial +1) + " to " + getDirection(newMove));
+
+		for (int k = 0; k < row; k++) {
+			for (int j = 0; j < column; j++) {
+				if(tiles[j][k].serial +1 < 10)System.out.print(" ");
+				System.out.print(" "+(tiles[j][k].serial +1));
 			}
 			System.out.print("\n");	
 		}
-		Log.i("moved", Integer.toString(nm));
-		Log.i("totalDistance", Integer.toString(totalDistance));		
+		Log.i("moved", Integer.toString(newMove.serial +1));
+		Log.i("totalDistance", Integer.toString(totalDistance));
+		System.out.println("棋譜　X "+ hole.lp.x + ",  Y" + hole.lp.y);
 	}
 }

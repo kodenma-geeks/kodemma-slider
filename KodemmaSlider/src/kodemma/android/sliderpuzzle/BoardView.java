@@ -103,7 +103,8 @@ public class BoardView extends View {
 	}
 	@Override protected void onDraw(Canvas canvas) {
 		if (invalidated == null) {	// ゲームボード上の全タイルを描画する
-			board.draw(canvas);
+//			board.draw(canvas);
+			board.draw(canvas,gameStatus);	// 浜田　引き数を追加
 		} else {					// 移動したタイルだけを描画する
 			for (Tile t : movables) board.drawTile(canvas, t, vec);
 		}

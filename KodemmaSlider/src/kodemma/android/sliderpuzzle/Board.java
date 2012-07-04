@@ -84,7 +84,7 @@ public class Board {
 				RectF dst = new RectF();
 				m.mapRect(dst, src);
 				
-				LogicalTile logicalTile = logicalBoard.tiles[i][j];
+				LogicalTile logicalTile = logicalBoard.tiles[j][i];	// 浜田　[j] [i] 入れ替え　7/3
 				Tile tile = new Tile(src, dst, logicalTile);
 				dstRectsMap.put(logicalTile.lp, new Rect(tile.dst));
 				tilesMap.put(logicalTile, tile);
@@ -147,10 +147,11 @@ public class Board {
 		slideCount++;
 	}
 	// ゲーム盤全体を描画する
-	void draw(Canvas canvas) {
+	void draw(Canvas canvas,GameStatus gs) {	// 浜田　引き数を追加
 		Rect buffer = new Rect();								// 作業用の矩形
 		for (Tile t : tiles) {
-			if (logicalBoard.hole == t.logicalTile) continue;	// 穴タイルは描画しない
+//			if (logicalBoard.hole == t.logicalTile) continue;	// 穴タイルは描画しない
+			if (gs != GameStatus.WAITING && logicalBoard.hole == t.logicalTile) continue;	// 穴タイルは描画しない
 			drawTile(canvas, t, buffer);
 		}
 	}
