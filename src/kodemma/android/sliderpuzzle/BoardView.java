@@ -40,7 +40,7 @@ enum GameStatus {
 }
 interface BoardViewListener extends EventListener {
 	public void onTileSlided(int count);
-	public void onGameSolved(int rows, int cols, int slides, long lapseTime);
+	public void onGameSolved(int rows, int cols, int slides);
 }
 interface AnimationListener extends EventListener {
 	public void onUndoStarted();
@@ -114,6 +114,7 @@ public class BoardView extends View implements AnimationListener {
 					splashListener.onSplashStarted();
 				}
 			}
+			SoundEffect.getSound(SoundEffect.sound_Up);
 			DRAW_ALL = true; // 部分再描画：不具合対応-start
 			//invalidate(invalidated); 部分再描画：不具合対応-start
 			invalidate();
@@ -176,7 +177,7 @@ public class BoardView extends View implements AnimationListener {
 		gameStatus = GameStatus.PLAYING;
 		invalidate();
 		splashMatrix = null;
-		boardViewListener.onGameSolved(board.rows, board.cols, board.slideCount, 1000L);
+		boardViewListener.onGameSolved(board.rows, board.cols, board.slideCount);
 	}
 	GameStatus startButtonPressed() {
 		switch (gameStatus) {

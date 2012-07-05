@@ -41,8 +41,13 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	public void onTileSlided(int count) {
 		slideCounterView.setText(String.valueOf(count));
 	}
-	public void onGameSolved(int rows, int cols, int slides, long lapseTime) {
+	public void onGameSolved(int rows, int cols, int slides) {
 		// ここでランキング画面へ遷移する
+//		Intent it = new Intent(BoardActivity.this, RankingActivity.class);
+//		it.putExtra("Laptime", PuzzleTimerTask.lapTime);
+//		it.putExtra("Slidecount", slides);
+//		it.putExtra("panels", rows*cols);
+//		startActivity(it);
 	}
 	private class ButtonClickListener implements View.OnClickListener {
 		private ButtonClickListener() {
@@ -57,10 +62,12 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 			switch (v.getId()) {
 			case R.id.board_button_start:
 				boardView.startButtonPressed();
+				SoundEffect.getSound(SoundEffect.sound_Button);
 				chronometer.timerStart();
 				break;
 			case R.id.board_button_pause:
 				GameStatus stat = boardView.pauseButtonPressed();
+				SoundEffect.getSound(SoundEffect.sound_Button);
 				if (stat == GameStatus.PAUSED) {
 					chronometer.timerPause();
 				} else if (stat == GameStatus.PLAYING) {
@@ -68,6 +75,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				}
 				break;
 			case R.id.board_button_setting:
+				SoundEffect.getSound(SoundEffect.sound_Button);
 				Intent it = new Intent(BoardActivity.this, SelectLevelActivity.class);
 				startActivityForResult(it, INTENT_FOR_SELECT_LEVEL);
 				break;

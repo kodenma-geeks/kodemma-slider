@@ -2,84 +2,82 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    >
-   
-        <LinearLayout
+    android:orientation="vertical" >
+
+    <LinearLayout
         android:id="@+id/linearTop"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.5"
-        android:padding="1dip"
         android:background="#ffffffff"
         android:orientation="horizontal"
-        >
-        <TextView 
+        android:padding="1dip" >
+
+        <TextView
             android:id="@+id/chronometer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="#ff000000"
-            android:textColor="#ffffffff"
-            android:textSize="20dp"
             android:text="00:00:00"
-            />
-        <TextView 
+            android:textColor="#ffffffff"
+            android:textSize="20dp" />
+
+        <TextView
             android:id="@+id/slideCounter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:background="#ffffffff"
-            android:textColor="#ff000000"
-            android:textSize="20dp"
             android:text="000"
-            />         
+            android:textColor="#ff000000"
+            android:textSize="20dp" />
     </LinearLayout>
-    
+
     <FrameLayout
         android:id="@+id/frame"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="9"
-        android:background="#ff000000"
-        >
+        android:background="#ff000000" >
+
         <kodemma.android.sliderpuzzle.BoardView
             android:id="@+id/boardView"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            />
+            android:layout_height="fill_parent" />
     </FrameLayout>
- 
-    
+
     <LinearLayout
         android:id="@+id/linearBottom"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal"
-        >
-        <Button style="@style/normalButton"
+        android:orientation="horizontal" >
+
+        <Button
             android:id="@id/board_button_start"
-            android:text="@string/board_button_start"
+            style="@style/normalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            />
-        <Button style="@style/normalButton"
+            android:text="@string/board_button_start" />
+
+        <Button
             android:id="@id/board_button_pause"
-            android:text="@string/board_button_pause"
+            style="@style/normalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            />
-        <Button style="@style/normalButton"
+            android:text="@string/board_button_pause" />
+
+        <Button
             android:id="@id/board_button_setting"
-            android:text="@string/board_button_setting"
+            style="@style/normalButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            />
-<!-- 
+            android:text="@string/board_button_setting" />
+        <!--
         <Button style="@style/normalButton"
             android:id="@id/board_button_answer"
             android:text="@string/board_button_answer"
@@ -93,7 +91,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            />
--->
+            />
+        -->
     </LinearLayout>
+
 </LinearLayout>

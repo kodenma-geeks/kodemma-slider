@@ -26,7 +26,7 @@ public class PuzzleTimerTask extends TimerTask{
 	    	public void run(){
 
 	    		lapTime += 100; 		
-	    		Date date = new Date(lapTime+32400000); 
+	    		Date date = new Date(lapTime-32400000); 
 	    		SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 	    		displayed.setText(format.format(date)); 
 
@@ -35,6 +35,13 @@ public class PuzzleTimerTask extends TimerTask{
 	}
 	public void timerStart(){
 		if(puzzleTimer == null){
+			lapTime = 0;
+			timerTask = new PuzzleTimerTask(displayed);
+			puzzleTimer = new Timer(true);
+			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
+		}
+		else if(puzzleTimer != null){
+			puzzleTimer.cancel();
 			lapTime = 0;
 			timerTask = new PuzzleTimerTask(displayed);
 			puzzleTimer = new Timer(true);
