@@ -29,6 +29,14 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		chronometer = new PuzzleTimerTask(chronometerView);
 		new ButtonClickListener();
 	}
+	public void onResume(){
+		super.onResume();
+		SoundEffect.soundLoad(this);
+	}
+	public void onStop(){
+		super.onStop();
+		SoundEffect.soundStop();
+	}
 	public void onActivityResult(int reqcode, int result, Intent it) {
 		switch(reqcode) {
 		case INTENT_FOR_SELECT_LEVEL:
@@ -62,8 +70,8 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 			switch (v.getId()) {
 			case R.id.board_button_start:
 				boardView.startButtonPressed();
-				SoundEffect.getSound(SoundEffect.sound_Button);
 				chronometer.timerStart();
+				SoundEffect.getSound(SoundEffect.sound_Button);
 				break;
 			case R.id.board_button_pause:
 				GameStatus stat = boardView.pauseButtonPressed();
