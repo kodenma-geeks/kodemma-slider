@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- *** Button *** -->
+    <item type="id" name="board_button_start"></item>
+    <item type="id" name="board_button_pause"></item>
+    <item type="id" name="board_button_setting"></item>
+    <item type="id" name="board_button_answer"></item>
+    <item type="id" name="board_button_suspend"></item>
+    <!-- * Array of Buttons * -->
+    <integer-array name="boardButtons">
+	    <item>@id/board_button_start</item>
+	    <item>@id/board_button_pause</item>
+	    <item>@id/board_button_setting</item>
+<!--
+	    <item>@id/board_button_answer</item>
+	    <item>@id/board_button_suspend</item>
+-->
+    </integer-array>
+</resources>

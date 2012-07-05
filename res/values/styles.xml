@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="normalButton" parent="android:style/Widget.Button">
+        <item name="android:textSize">10sp</item>
+        <item name="android:typeface">normal</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/green</item>
+    </style>
+    
+    <style name="normalText" parent="android:style/TextAppearance.Medium">
+        <item name="android:textSize">18sp</item>
+        <item name="android:typeface">normal</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+    
+    <style name="normalEdit" parent="android:style/Widget.EditText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:typeface">normal</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
+</resources>
