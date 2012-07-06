@@ -90,6 +90,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 		btnChoose.setOnClickListener(new ChooseClickListner());
 	}
 	// =================== gallery result  ================= //
+	@SuppressWarnings("null")
 	public void onActivityResult(int reqcode, int result, Intent it){
 		ImageView iv = (ImageView) findViewById(R.id.imageview1);
 		if( reqcode == KDMA_SLIDE && result == RESULT_OK ){
@@ -103,11 +104,15 @@ public class SelectLevelActivity extends SharedMenuActivity {
 				String filename = "content://media/external/images/media/" + cursor.getString(0); 
 				cursor.close();
 				e.putString("uri", filename);e.commit();
-
-				InputStream is = getContentResolver().openInputStream(u);
-				Bitmap bmp = BitmapFactory.decodeStream(is);
-				iv.setImageBitmap(bmp);
-			}catch(Exception e){}
+				
+				Bitmap bmp = null;
+				bmp.recycle();
+				if(bmp.isRecycled()){ // countermeasure OutOfMemoryError
+					InputStream is = getContentResolver().openInputStream(u);
+					bmp = BitmapFactory.decodeStream(is);
+					iv.setImageBitmap(bmp);
+				}
+			}catch(Exception e){ e.printStackTrace(); }
 		}
 	}
 	// =================== Button Click Listener ================= // 
