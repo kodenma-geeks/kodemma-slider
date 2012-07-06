@@ -71,6 +71,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 			case R.id.board_button_start:
 				boardView.startButtonPressed();
 				chronometer.timerStart();
+				SoundEffect.getSound(SoundEffect.sound_Button_on);
 				break;
 			case R.id.board_button_pause:
 				GameStatus stat = boardView.pauseButtonPressed();

@@ -172,6 +172,7 @@ public class BoardView extends View implements AnimationListener {
 		splashMatrix = new Matrix();
 		// ゲーム完了時のスプラッシュアニメーションを執り行うハンドラを起動
 		new SplashHandler().start();
+		SoundEffect.getSound(SoundEffect.sound_solved);
 	}
 	public void onSplashEnded() {
 		gameStatus = GameStatus.PLAYING;
