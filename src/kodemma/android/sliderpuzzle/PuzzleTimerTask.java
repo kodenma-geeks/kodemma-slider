@@ -13,18 +13,18 @@ public class PuzzleTimerTask extends TimerTask{
 	TextView displayed;
 
 	final Handler hn = new Handler();
-	
+//コンストラクタ	
 	public PuzzleTimerTask(TextView disp){
 		super();
 		displayed = disp;
 	}
-
+//1/10秒ごとに100ミリ秒インクリメント
 	public void run() {
 		hn.post(new Runnable() {
 			public void run() {
 
 				lapTime += 100;
-				
+				//秒数を60で割って余りを秒数に表示、以下分と時間も同じ
 				long time = lapTime;
 				time /= 1000;
 		        long second = time % 60;
@@ -37,7 +37,7 @@ public class PuzzleTimerTask extends TimerTask{
 			}
 		});
 	}
-
+//スタート、リスタートごとにTimerTaskを生成（一度キャンセルして止めると再利用できない為）
 	public void timerStart() {
 		if (puzzleTimer == null) {
 			lapTime = 0;
