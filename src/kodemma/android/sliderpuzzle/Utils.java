@@ -1,5 +1,6 @@
 package kodemma.android.sliderpuzzle;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -23,6 +24,25 @@ public class Utils {
 		matrix.setScale(scale, scale);
 		matrix.postTranslate(dx, dy);
 		return matrix;
+	}
+	public static Point getColRow(Bitmap b, Level lv) {
+		int col;
+		int row;
+		if(b.getWidth() < b.getHeight()){
+			col = lv.small();
+			row = lv.large();
+		}else{
+			row = lv.small();
+			col = lv.large();			
+		}
+		return new Point(col, row);
+	}
+	public static int getScore(Level lv, long ms, int count) {
+		final int BONUS = 10000;	// スコアが適度な値になるためのボーナス値
+		final int PANEL_VALUE = 120;// パネル１枚ごとに与えられる点数
+		int time = (int)ms/1000;	// ミリ秒から秒へ変換
+		int score = (BONUS/count)*(lv.tiles()*PANEL_VALUE)/time;
+		return score;
 	}
 	public static Point getAdjustedVector(Point sp, Point ep, Point limiter) {
 		Point vec = new Point(ep.x - sp.x, ep.y - sp.y);

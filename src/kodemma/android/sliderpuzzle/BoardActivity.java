@@ -14,6 +14,10 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	private TextView chronometerView;
 	
 	private PuzzleTimerTask chronometer;
+	
+//	private Board board;	// 浜田　追記7/5
+//	private BoardViewListener boardViewListener;	// 浜田　追記7/5
+	GameStatus stat;	// 浜田　追記7/5
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,6 +42,14 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		case INTENT_FOR_SELECT_LEVEL:
 			if (result == RESULT_OK) {
 				// ここに書く
+				if (stat != GameStatus.PLAYING) {
+//					Bundle b = it.getExtras();
+//					boardView.board.bitmap = (Bitmap)b.get("PICTURE");
+//					boardView.board.rows = it.getIntExtra("LEVEL",0)+3;
+//					boardView.board.cols = it.getIntExtra("LEVEL",0)+3;
+				}
+				boardView.board.showId = it.getBooleanExtra("HINT",false);
+				boardView.board.isGrid = it.getBooleanExtra("TILE",false);
 			}
 			break;
 		}
@@ -70,7 +82,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				SoundEffect.getSound(SoundEffect.sound_Button_on);
 				break;
 			case R.id.board_button_pause:
-				GameStatus stat = boardView.pauseButtonPressed();
+				stat = boardView.pauseButtonPressed();
 				if (stat == GameStatus.PAUSED) {
 					SoundEffect.getSound(SoundEffect.sound_Button_on);
 					chronometer.timerPause();
@@ -82,6 +94,9 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 			case R.id.board_button_setting:
 				SoundEffect.getSound(SoundEffect.sound_Button_on);
 				Intent it = new Intent(BoardActivity.this, SelectLevelActivity.class);
+				it.putExtra("STATUS", stat);
+//				it.putExtra("HINT", boardView.board.showId);
+//				it.putExtra("PICTURE", boardView.board.bitmap);
 				startActivityForResult(it, INTENT_FOR_SELECT_LEVEL);
 				break;
 			case R.id.board_button_answer:

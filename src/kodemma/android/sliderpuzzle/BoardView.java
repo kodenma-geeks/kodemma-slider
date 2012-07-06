@@ -1,5 +1,7 @@
 package kodemma.android.sliderpuzzle;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EventListener;
 import java.util.HashSet;
@@ -7,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -23,6 +26,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -55,7 +59,15 @@ public class BoardView extends View implements AnimationListener {
 	private Point limiter = new Point();	// 移動ベクトルのリミッタ
 	private Point vec;						// 移動ベクトル
 	private Rect invalidated;				// 再描画する矩形領域
-	private Board board;					// ゲーム盤クラス
+	Board board;					// ゲーム盤クラス
+	Bitmap bitmap; // 浜田　7/5
+	boolean showId;						// タイル番号の表示/非表示
+	boolean isGrid;						// タイル枠の表示/非表示
+//	int rows; // 浜田　7/5
+//	int cols; // 浜田　7/5
+//	int small; // 浜田　7/5
+//	int large; // 浜田　7/5
+	Level lv; // 浜田　7/5
 	private List<Tile> movables = new ArrayList<Tile>();	// スライドするタイル群
 	private Set<Tile> movablesSet = new HashSet<Tile>(); 
 	private GameStatus gameStatus = GameStatus.WAITING;
@@ -75,15 +87,32 @@ public class BoardView extends View implements AnimationListener {
 		shieldPaint = new Paint();
 		shieldPaint.setColor(Color.BLUE);
 		shieldPaint.setAlpha(128);
+
+		int l = (SelectLevelActivity.getLevelSetting(context)==0)? 1: SelectLevelActivity.getLevelSetting(context);
+		lv = Level.levels().get(l);
+		
+		ContentResolver contentResolver = context.getContentResolver();
+		Uri u = SelectLevelActivity.getImgUriSetting(context);
+		InputStream inputStream = null;
+		try {
+			inputStream = contentResolver.openInputStream(u);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		bitmap = BitmapFactory.decodeStream(inputStream);
+//		bitmap = BitmapFactory.getBitmapFromUri(u);
+		showId = SelectLevelActivity.getHintSetting(context);
+		isGrid = SelectLevelActivity.getTileSetting(context);
 	}
 	@Override protected void onSizeChanged(int w, int h, int pw, int ph) {
 		super.onSizeChanged(w, h, pw, ph);
 		shield = new Rect(0, 0, w, h);
 		
-		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sky);
-		board = new Board(bitmap, 4, 3, w, h);
+// 		bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.sky);
+		board = new Board(bitmap, Utils.getColRow(bitmap, lv).y,  Utils.getColRow(bitmap, lv).x, w, h, showId,isGrid);
+//		board = new Board(bitmap, rows, cols, w, h);
 		board.initializeTiles();
-//		board.shuffle();
+// 		board.shuffle();
 		
 		boardViewListener.onTileSlided(board.slideCount);
 	}

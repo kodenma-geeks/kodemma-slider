@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -45,12 +46,16 @@ public class Board {
 	private Map<Point, Rect> dstRectsMap;		// タイルの論理位置と描画時の矩形のマッパー
 	private Map<LogicalTile, Tile> tilesMap;	// 論理タイルとタイルのマッパー
 	int slideCount = 0;							// ユーザのスライド回数
-	boolean showId = true;						// タイル番号の表示/非表示
+
 	Paint textPaint;							// タイル番号表示用(テキスト)
 	Paint tagPaint;								// タイル番号表示用(タグ)
 	Paint shadowPaint;							// タイル番号表示用(タグの影)
 	
-	Board(Bitmap b, int r, int c, int w, int h) {
+	boolean showId;								// タイル番号の表示/非表示
+	boolean isGrid;								// タイルの枠の表示/非表示
+	int border;		// 浜田						// タイルの枠線の幅
+	
+	Board(Bitmap b, int r, int c, int w, int h,	boolean si, boolean gr) {
 		bitmap = b;
 		rows = r; cols = c;
 		width = w; height = h;
@@ -62,7 +67,11 @@ public class Board {
 		textPaint.setColor(Color.WHITE);
 		tagPaint.setColor(Color.GRAY);
 		shadowPaint.setColor(Color.DKGRAY);
+		
+		showId = si;		// 浜田
+		border = gr? BORDER_WIDTH : 0;	// 浜田
 	}
+
 	// タイルの生成と初期化を行う
 	void initializeTiles() {
 		// タイルのsrc矩形からdst矩形への変換をするためのマトリックスを作成する
@@ -166,12 +175,12 @@ public class Board {
 	void drawTile(Canvas canvas, Tile tile, Point vector) {
 		Rect buffer = new Rect();								// 作業用の矩形
 		Utils.translateByVector(vector, tile.dst, buffer);		// 移動ベクトルを加算する
-		Utils.scaleByBorder(-BORDER_WIDTH, buffer, buffer);		// 枠線の分だけタイルを縮小する
+		Utils.scaleByBorder(-border, buffer, buffer);		// 枠線の分だけタイルを縮小する
 		drawTile(canvas, tile.src, buffer, getTileId(tile));
 	}
 	// タイルを描画する - draw()メソッドからコールされる
 	void drawTile(Canvas canvas, Tile tile, Rect buffer) {
-		Utils.scaleByBorder(-BORDER_WIDTH, tile.dst, buffer);	// 枠線の分だけタイルを縮小する
+		Utils.scaleByBorder(-border, tile.dst, buffer);	// 枠線の分だけタイルを縮小する
 		drawTile(canvas, tile.src, buffer, getTileId(tile));
 	}
 	// タイルを描画する - 最終的にこのメソッドで描画
