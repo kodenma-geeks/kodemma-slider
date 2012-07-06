@@ -1,6 +1,7 @@
 package kodemma.android.sliderpuzzle;
 
 import java.io.InputStream;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,12 +29,18 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	private CheckBox cbhint, cbtile; // HINT, TILE
 	private Button btnChoose, btnPlayActCall, btnRankingActCall, btnTitleActCall;
 
+	@SuppressWarnings("null")
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.setting);
 		// level spinner ---------------------------------------
 		spnlvl = (Spinner) this.findViewById(R.id.spinner1);
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.ary_lv, android.R.layout.simple_spinner_item);
+		
+		String[] str = new String[10];
+		int i=0;
+		for (Level v : Level.levels().values()) { str[i]=v.text(); i++;}
+		
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, str);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 		spnlvl.setAdapter(adapter);
@@ -44,9 +51,8 @@ public class SelectLevelActivity extends SharedMenuActivity {
 				Integer res =  spinner.getSelectedItemPosition();
 				SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
 				Editor e = pref.edit();
-				e.putInt("level", res);e.commit();
+				e.putInt("level", res+1);e.commit();
 			}
-
 			public void onNothingSelected(AdapterView<?> v) {}
 		});
 		// hint ------------------------------------------------
@@ -108,7 +114,9 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	class BtnClickListner implements OnClickListener{
 		public void onClick(View v){
 			Intent it = null;
-
+			if( v == btnPlayActCall ){ it = new Intent(SelectLevelActivity.this, BoardActivity.class);}
+			else if( v == btnRankingActCall ){ it = new Intent(SelectLevelActivity.this, RankingActivity.class);}
+			else if( v == btnTitleActCall ){ it = new Intent(SelectLevelActivity.this, TitleActivity.class);}
 			startActivity(it);
 		}
 	}

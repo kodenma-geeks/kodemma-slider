@@ -31,11 +31,11 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onResume(){
 		super.onResume();
-		SoundEffect.soundLoad(this);
+//		SoundEffect.soundLoad(this);
 	}
 	public void onStop(){
 		super.onStop();
-		SoundEffect.soundStop();
+//		SoundEffect.soundStop();
 	}
 	public void onActivityResult(int reqcode, int result, Intent it) {
 		switch(reqcode) {
@@ -71,11 +71,11 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 			case R.id.board_button_start:
 				boardView.startButtonPressed();
 				chronometer.timerStart();
-				SoundEffect.getSound(SoundEffect.sound_Button);
+//				SoundEffect.getSound(SoundEffect.sound_Button);
 				break;
 			case R.id.board_button_pause:
 				GameStatus stat = boardView.pauseButtonPressed();
-				SoundEffect.getSound(SoundEffect.sound_Button);
+//				SoundEffect.getSound(SoundEffect.sound_Button);
 				if (stat == GameStatus.PAUSED) {
 					chronometer.timerPause();
 				} else if (stat == GameStatus.PLAYING) {
@@ -83,7 +83,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				}
 				break;
 			case R.id.board_button_setting:
-				SoundEffect.getSound(SoundEffect.sound_Button);
+//				SoundEffect.getSound(SoundEffect.sound_Button);
 				Intent it = new Intent(BoardActivity.this, SelectLevelActivity.class);
 				startActivityForResult(it, INTENT_FOR_SELECT_LEVEL);
 				break;

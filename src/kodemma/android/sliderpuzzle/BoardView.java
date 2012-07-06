@@ -114,7 +114,7 @@ public class BoardView extends View implements AnimationListener {
 					splashListener.onSplashStarted();
 				}
 			}
-			SoundEffect.getSound(SoundEffect.sound_Up);
+//			SoundEffect.getSound(SoundEffect.sound_Up);
 			DRAW_ALL = true; // 部分再描画：不具合対応-start
 			//invalidate(invalidated); 部分再描画：不具合対応-start
 			invalidate();
