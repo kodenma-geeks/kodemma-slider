@@ -44,7 +44,7 @@ public class LogicalBoard {
 //		maxDistance = (int)(r * c * TWICE_VALUE);// shima
 //		shuffleLimit = (int)(maxDistance * LIMIT_VALUE);//shima
 
-		holeNumber = (int) (Math.random() * r * c + 1);	// ブランクを決定
+		holeNumber = (int) (Math.random() * r * c);	// ブランクを決定
 		
 		// 配置の初期化
 		tiles = new LogicalTile[c][r];

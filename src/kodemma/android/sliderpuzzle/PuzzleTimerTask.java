@@ -35,12 +35,14 @@ public class PuzzleTimerTask extends TimerTask{
 	}
 	public void timerStart(){
 		if(puzzleTimer == null){
+			SoundEffect.getSound(SoundEffect.sound_Button_on);
 			lapTime = 0;
 			timerTask = new PuzzleTimerTask(displayed);
 			puzzleTimer = new Timer(true);
 			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
 		}
 		else if(puzzleTimer != null){
+			SoundEffect.getSound(SoundEffect.sound_Button_off);
 			puzzleTimer.cancel();
 			lapTime = 0;
 			timerTask = new PuzzleTimerTask(displayed);
