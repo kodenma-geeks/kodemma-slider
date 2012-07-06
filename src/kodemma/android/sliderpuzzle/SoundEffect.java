@@ -11,14 +11,16 @@ public class SoundEffect {
 	static int sound_Up;
 	static int sound_Button_on;
 	static int sound_Button_off;
+	static int sound_solved;
 	
 	public static void soundLoad(Context cn){
 		mSoundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 //		sound_Touch = mSoundPool.load(cn, R.raw.switch_ti, 1);
 //		sound_Move = mSoundPool.load(this, R.raw., 1);
 		sound_Up = mSoundPool.load(cn, R.raw.switch_ti, 1);
-		sound_Button_on = mSoundPool.load(cn, R.raw.turi, 1);
-		sound_Button_off = mSoundPool.load(cn, R.raw.pipon, 1);
+		sound_Button_on = mSoundPool.load(cn, R.raw.pipon, 1);
+		sound_Button_off = mSoundPool.load(cn, R.raw.popin, 1);
+		sound_solved = mSoundPool.load(cn, R.raw.turururu, 1);
 	}
 	public static void soundStop(){
 //		mSoundPool.unload(sound_Touch);
@@ -26,6 +28,7 @@ public class SoundEffect {
 		mSoundPool.unload(sound_Up);
 		mSoundPool.unload(sound_Button_on);
 		mSoundPool.unload(sound_Button_off);
+		mSoundPool.unload(sound_solved);
 		mSoundPool.release();
 	}
 	public static void getSound(int sound_source){
