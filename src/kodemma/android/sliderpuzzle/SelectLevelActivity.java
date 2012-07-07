@@ -23,7 +23,9 @@ import android.widget.Spinner;
 
 public class SelectLevelActivity extends SharedMenuActivity {
 
-	public static int KDMA_SLIDE = 1;
+	private static final int KDMA_SLIDE = 1;
+	private static final String DEFAULT_IMAGE_URI = Utils.getResourceUri(R.drawable.ega);
+	
 	private Spinner spnlvl; // Level setting
 	private CheckBox cbhint, cbtile; // HINT, TILE
 	private Button btnChoose, btnPlayActCall, btnRankingActCall, btnTitleActCall;
@@ -170,6 +172,6 @@ public class SelectLevelActivity extends SharedMenuActivity {
 		return context.getSharedPreferences("pref", MODE_PRIVATE).getBoolean("tile", false);	
 	}
 	public static Uri getImgUriSetting(Context context) {
-		return Uri.parse(context.getSharedPreferences("pref", MODE_PRIVATE).getString("uri", null));
+		return Uri.parse(context.getSharedPreferences("pref", MODE_PRIVATE).getString("uri", DEFAULT_IMAGE_URI));
 	}
 }

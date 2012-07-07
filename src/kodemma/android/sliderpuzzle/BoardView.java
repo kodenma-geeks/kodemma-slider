@@ -88,13 +88,14 @@ public class BoardView extends View implements AnimationListener {
 		shieldPaint.setColor(Color.BLUE);
 		shieldPaint.setAlpha(128);
 
-		int l = (SelectLevelActivity.getLevelSetting(context)==0)? 1: SelectLevelActivity.getLevelSetting(context);
+//		int l = (SelectLevelActivity.getLevelSetting(context)==0)? 1: SelectLevelActivity.getLevelSetting(context);
+		int l = SelectLevelActivity.getLevelSetting(context);
 		lv = Level.levels().get(l);
 		
-		ContentResolver contentResolver = context.getContentResolver();
 		Uri u = SelectLevelActivity.getImgUriSetting(context);
 		InputStream inputStream = null;
 		try {
+			ContentResolver contentResolver = context.getContentResolver();
 			inputStream = contentResolver.openInputStream(u);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

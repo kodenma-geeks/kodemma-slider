@@ -10,6 +10,9 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 
 public class Utils {
+	public static String getResourceUri(int resourceId) {
+		return "android.resource://" + Utils.class.getPackage().getName() + "/" + resourceId;
+	}
 	public static Matrix adjustingMatrix(float srcWidth, float srcHeight, float dstWidth, float dstHeight) {
 		float scale;
 		float dx = 0f, dy = 0f;
