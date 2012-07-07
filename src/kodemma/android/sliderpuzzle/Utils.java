@@ -9,6 +9,20 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+enum Direction {
+	NONE, UP, DOWN, RIGHT, LEFT, OTHER;
+	public boolean virtical() { return this == UP || this == DOWN; }
+	public boolean horizontal() { return this == RIGHT || this == LEFT; }
+	public boolean invalid() { return this == NONE || this == OTHER; }
+	public boolean valid() { return !invalid(); }
+	public static Direction direction(Point sp, Point ep) {	// 始点から終点への方向を取得する。 
+		int x = ep.x - sp.x; int y = ep.y - sp.y;
+		if (x == 0 && y == 0) return NONE;
+		if (x == 0) return (y > 0)? DOWN : UP;
+		if (y == 0) return (x > 0)? RIGHT : LEFT;
+		return OTHER;
+	}
+}
 public class Utils {
 	public static String getResourceUri(int resourceId) {
 		return "android.resource://" + Utils.class.getPackage().getName() + "/" + resourceId;

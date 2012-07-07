@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.graphics.Point;
 import android.util.*;
-enum Direction {UP, DOWN, LEFT, RIGHT, NON };
+//enum Direction {UP, DOWN, LEFT, RIGHT, NON }; // Utilsへ移動
 
 class LogicalTile {
 	int serial;				// 実番号より１少ない連番（０スタート）
@@ -145,24 +145,26 @@ public class LogicalBoard {
 	
 	// 新メソッド　方向ゲット
 	protected Direction getDirection(LogicalTile logTil) {
-		direction = Direction.NON;
-		if (hole.lp.y == logTil.lp.y) {	// 上下に並んだ列の中から
-			if (hole.lp.x > logTil.lp.x) {	// 左見て
-				direction = Direction.RIGHT;
-			}
-			if (hole.lp.x < logTil.lp.x) {	// 右見て
-				direction = Direction.LEFT;
-			}
-		}
-		if (hole.lp.x == logTil.lp.x) {	// 左右に並んだ列の中から
-			if (hole.lp.y > logTil.lp.y) {	// 上見て
-				direction = Direction.DOWN;
-			}
-			if (hole.lp.y < logTil.lp.y) {	// 下見て
-				direction = Direction.UP;
-			}
-		}
-		return direction;	// デバッグ用に変数に入れてみたが、ifの中で直接returnしても良い
+		return Direction.direction(logTil.lp, hole.lp);
+		// 以下、を上記Directionのメソッドに委譲するようにした。
+//		direction = Direction.NONE;
+//		if (hole.lp.y == logTil.lp.y) {	// 上下に並んだ列の中から
+//			if (hole.lp.x > logTil.lp.x) {	// 左見て
+//				direction = Direction.RIGHT;
+//			}
+//			if (hole.lp.x < logTil.lp.x) {	// 右見て
+//				direction = Direction.LEFT;
+//			}
+//		}
+//		if (hole.lp.x == logTil.lp.x) {	// 左右に並んだ列の中から
+//			if (hole.lp.y > logTil.lp.y) {	// 上見て
+//				direction = Direction.DOWN;
+//			}
+//			if (hole.lp.y < logTil.lp.y) {	// 下見て
+//				direction = Direction.UP;
+//			}
+//		}
+//		return direction;	// デバッグ用に変数に入れてみたが、ifの中で直接returnしても良い
 	}
 	
 	// 新メソッド　動かせるタイルリスト

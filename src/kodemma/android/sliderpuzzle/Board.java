@@ -134,6 +134,7 @@ public class Board {
 		case DOWN:	limiter.y =  hole.dst.height();	break;
 		case LEFT:	limiter.x = -hole.dst.width();	break;
 		case RIGHT:	limiter.x =  hole.dst.width();	break;
+		default: return null;
 		}
 		return rect;
 	}

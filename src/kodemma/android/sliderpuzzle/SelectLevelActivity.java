@@ -60,7 +60,8 @@ public class SelectLevelActivity extends SharedMenuActivity {
 				res =  spinner.getSelectedItemPosition();
 				SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
 				Editor e = pref.edit();
-				e.putInt("level", res);e.commit();
+//				e.putInt("level", res);e.commit();
+				e.putInt("level", res+1);e.commit();
 			}
 
 			public void onNothingSelected(AdapterView<?> v) {}
