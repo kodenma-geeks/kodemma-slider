@@ -160,13 +160,8 @@ public class BoardView extends View implements AnimationListener {
 		return true;
 	}
 	@Override protected void onDraw(Canvas canvas) {
+//		Log.d(TAG, "gameStatus=" + gameStatus + ", DRAW_ALL=" + DRAW_ALL);
 		if (gameStatus == GameStatus.SOLVED) {
-//			board.drawFrameInSplash(canvas, splashMatrix);
-		Log.d(TAG, "ONDRAW!!!");
-//				Rect buffer = new Rect();
-//				for (Tile t : movables) board.drawTile(canvas, t, buffer);
-//				vec = null;
-//				DRAW_ALL = false;
 			board.draw(canvas, gameStatus, movablesSet);
 		} else {
 			board.draw(canvas, gameStatus, movablesSet);
@@ -223,19 +218,22 @@ public class BoardView extends View implements AnimationListener {
 		boardViewListener.onGameSolved(board.rows, board.cols, board.slideCount);
 	}
 	GameStatus startButtonPressed() {
+		movables.clear();
+		movablesSet.clear();
+		vec = null;
 		switch (gameStatus) {
 		case WAITING:
 			board.shuffle();
 			boardViewListener.onTileSlided(board.slideCount);
 			gameStatus = GameStatus.PLAYING;
-			DRAW_ALL = true;
+			DRAW_ALL = false;
 			invalidate();
 			break;
 		case PLAYING:
 			// dialog
 			board.shuffle();
 			boardViewListener.onTileSlided(board.slideCount);
-			DRAW_ALL = true;
+			DRAW_ALL = false;
 			invalidate();
 			break;
 		}
@@ -296,7 +294,6 @@ public class BoardView extends View implements AnimationListener {
 				gameStatus = GameStatus.SOLVED;
 				if (board.undo()) {
 					SoundEffect.getSound(SoundEffect.sound_Up);
-		Log.d(TAG, "UNDO!!!");
 					DRAW_ALL = true;
 					invalidate();
 					sendNextMessage();
