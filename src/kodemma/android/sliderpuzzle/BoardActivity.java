@@ -41,7 +41,6 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		switch(reqcode) {
 		case INTENT_FOR_SELECT_LEVEL:
 			if (result == RESULT_OK) {
-				// ここに書く
 				if (stat != GameStatus.PLAYING) {
 //					Bundle b = it.getExtras();
 //					boardView.board.bitmap = (Bitmap)b.get("PICTURE");
@@ -56,6 +55,13 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onTileSlided(int count) {
 		slideCounterView.setText(String.valueOf(count));
+	}
+	public void onChronometerSwitched(boolean on) {
+		if (on) {
+			chronometer.timerStart();
+		} else {
+			chronometer.timerPause();
+		}
 	}
 	public void onGameSolved(int rows, int cols, int slides) {
 		// ここでランキング画面へ遷移する
@@ -100,6 +106,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				startActivityForResult(it, INTENT_FOR_SELECT_LEVEL);
 				break;
 			case R.id.board_button_answer:
+				stat = boardView.undoButtonPressed();
 				break;
 			case R.id.board_button_suspend:
 				break;

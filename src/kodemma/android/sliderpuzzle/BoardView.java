@@ -45,6 +45,7 @@ enum GameStatus {
 interface BoardViewListener extends EventListener {
 	public void onTileSlided(int count);
 	public void onGameSolved(int rows, int cols, int slides);
+	public void onChronometerSwitched(boolean onoff);
 }
 interface AnimationListener extends EventListener {
 	public void onUndoStarted();
@@ -141,7 +142,9 @@ public class BoardView extends View implements AnimationListener {
 				for (Tile t : movables) board.slide(t);
 				boardViewListener.onTileSlided(board.slideCount);
 				if (board.solved()) {	// パズルが解かれた場合
-					splashListener.onSplashStarted();
+					boardViewListener.onChronometerSwitched(false);
+//					splashListener.onSplashStarted();
+					splashListener.onUndoStarted();
 				}
 			}
 			SoundEffect.getSound(SoundEffect.sound_Up);
@@ -158,7 +161,13 @@ public class BoardView extends View implements AnimationListener {
 	}
 	@Override protected void onDraw(Canvas canvas) {
 		if (gameStatus == GameStatus.SOLVED) {
-			board.drawFrameInSplash(canvas, splashMatrix);
+//			board.drawFrameInSplash(canvas, splashMatrix);
+		Log.d(TAG, "ONDRAW!!!");
+//				Rect buffer = new Rect();
+//				for (Tile t : movables) board.drawTile(canvas, t, buffer);
+//				vec = null;
+//				DRAW_ALL = false;
+			board.draw(canvas, gameStatus, movablesSet);
 		} else {
 			board.draw(canvas, gameStatus, movablesSet);
 			if (DRAW_ALL) {
@@ -190,10 +199,13 @@ public class BoardView extends View implements AnimationListener {
 		splushFrameCounter = 0;
 		// アンドゥ時のアニメーションを執り行うハンドラを起動
 		new UndoHandler().start();
+		SoundEffect.getSound(SoundEffect.sound_solved);
 	}
 	public void onUndoEnded() {
 		gameStatus = GameStatus.PLAYING;
+		gameStatus = GameStatus.WAITING;
 		invalidate();
+		boardViewListener.onGameSolved(board.rows, board.cols, board.slideCount);
 	}
 	public void onSplashStarted() {
 		Log.d(TAG, "SOLVED!!!");
@@ -246,6 +258,17 @@ public class BoardView extends View implements AnimationListener {
 		}
 		return gameStatus;
 	}
+	GameStatus undoButtonPressed() {
+//		switch (gameStatus) {
+//		case PLAYING:
+//			gameStatus = GameStatus.PAUSED;
+			board.undo();
+			DRAW_ALL = true;
+			invalidate();
+//			break;
+//		}
+		return gameStatus;
+	}
 	// アンドゥ時のアニメーションを執り行うハンドラ
 	class UndoHandler extends Handler {
 		private static final int INVALIDATE = 1;
@@ -253,7 +276,6 @@ public class BoardView extends View implements AnimationListener {
 		private static final int INTERVAL = 1000 / FRAMES;
 		private long nextTime;
 		
-		float deg = 3.3f/20f;
 		void start() {
 			Message msg = obtainMessage(INVALIDATE);
 			nextTime = SystemClock.uptimeMillis();
@@ -266,25 +288,21 @@ public class BoardView extends View implements AnimationListener {
 			if (nextTime < current) {
 				nextTime = current + INTERVAL;
 			}
-			if (splushFrameCounter++ < FRAMES*1) {
-				sendMessageAtTime(msg, nextTime);
-				nextTime += INTERVAL;
-			} else {
-				splashListener.onSplashEnded();
-			}
-		}
-		private void moveSplashMatrix(Matrix m) {
-			//m.postScale(0.9f, 0.9f);
-			m.setScale(0.9f, 0.9f);
-			m.postRotate(deg);
-			deg *= 2f;
+			sendMessageAtTime(msg, nextTime);
+			nextTime += INTERVAL;
 		}
 		@Override public void handleMessage(Message msg){
 			if (msg.what == INVALIDATE) {
 				gameStatus = GameStatus.SOLVED;
-				moveSplashMatrix(splashMatrix);
-				invalidate();
-				sendNextMessage();
+				if (board.undo()) {
+					SoundEffect.getSound(SoundEffect.sound_Up);
+		Log.d(TAG, "UNDO!!!");
+					DRAW_ALL = true;
+					invalidate();
+					sendNextMessage();
+				} else {
+					splashListener.onUndoEnded();
+				}
 			}
 		}
 	}

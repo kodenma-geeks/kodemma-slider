@@ -69,7 +69,8 @@ public class Board {
 		shadowPaint.setColor(Color.DKGRAY);
 		
 		showId = si;		// 浜田
-		border = gr? BORDER_WIDTH : 0;	// 浜田
+		isGrid = gr;
+		border = isGrid? BORDER_WIDTH : 0;	// 浜田
 	}
 
 	// タイルの生成と初期化を行う
@@ -159,6 +160,20 @@ public class Board {
 		tile.dst = hole.dst;
 		hole.dst = tmp;
 		slideCount++;
+	}
+	// タイルのスライドをアンドゥする
+	boolean undo() {
+		LogicalTile latest = logicalBoard.getUndoTile();
+		if (latest == null) return false;
+		Tile undo = tilesMap.get(latest);
+		Tile hole = tilesMap.get(logicalBoard.hole);
+		logicalBoard.undo();
+		// スライドしたタイルと穴タイルのdst矩形を交換する。
+		Rect tmp = undo.dst;
+		undo.dst = hole.dst;
+		hole.dst = tmp;
+		slideCount--;
+		return true;
 	}
 	// パズルが解かれたかどうか
 	boolean solved() { return logicalBoard.totalDistance == 0; }

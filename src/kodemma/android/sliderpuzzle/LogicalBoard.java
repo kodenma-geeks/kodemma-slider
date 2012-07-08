@@ -5,7 +5,7 @@ import java.util.List;
 
 import android.graphics.Point;
 import android.util.*;
-//enum Direction {UP, DOWN, LEFT, RIGHT, NON }; // Utilsへ移動
+//enum Direction {UP, DOWN, LEFT, RIGHT, NON }; // Utilsへ移動 by shima
 
 class LogicalTile {
 	int serial;				// 実番号より１少ない連番（０スタート）
@@ -58,6 +58,7 @@ public class LogicalBoard {
 
 				if (serial == holeNumber) {
 					hole = tiles[j][i];			// ブランクを紐付け
+					recode.add(hole.lp);		// added by shima
 					oldMove = hole;				// シャッフル１周目用に暫定保存
 				}
 			}
@@ -72,10 +73,11 @@ public class LogicalBoard {
 //		oldMove = -1;
 		
 		// シャッフル開始
-		for (int i = 0; i < (int)(row * column * TWICE_VALUE * LIMIT_VALUE); i++) {
+//		for (int i = 0; i < (int)(row * column * TWICE_VALUE * LIMIT_VALUE); i++) {
+		for (int i = 0; i < 3; i++) {
 
 			// 棋譜を一手追加
-			recode.add(new Point(hole.lp.x, hole.lp.y));
+//			recode.add(new Point(hole.lp.x, hole.lp.y)); // removed by shima
 
 			tile = canMoveTileSelect();
 			/*
@@ -106,7 +108,7 @@ public class LogicalBoard {
 			}
 		}
 		// 棋譜に最後の一手を追加
-		recode.add(new Point(hole.lp.x, hole.lp.y));
+//		recode.add(new Point(hole.lp.x, hole.lp.y)); // removed by shima
 
 		return recode.size();
 	}
@@ -205,6 +207,8 @@ public class LogicalBoard {
 			pointTmp.lp = logTil.lp;
 			logTil.lp = hole.lp;
 			hole.lp = pointTmp.lp;
+			// 棋譜への追加
+			recode.add(hole.lp); // added by shima
 
 //			tmp.lp = tiles[hole.lp.x][hole.lp.y].lp;
 //			tiles[hole.lp.x][hole.lp.y].lp = tiles[logTil.lp.x][logTil.lp.y].lp;
@@ -224,7 +228,36 @@ public class LogicalBoard {
 		}
 		return false;
 	}
-
+	boolean undo() {
+		LogicalTile undo = getUndoTile();
+		if (undo == null) return false;
+		totalDistance -= getDistance(undo);	// 現状の離散度を減算
+		Point u = undo.lp;
+		Point h = hole.lp;
+		// タイルを移動する
+		LogicalTile tmp = tiles[u.x][u.y];
+		tiles[u.x][u.y] = tiles[h.x][h.y];
+		tiles[h.x][h.y] = tmp;
+		// 論理位置を付け替える
+		undo.lp = hole.lp;
+		hole.lp = u;
+		totalDistance += getDistance(undo);	// 新しい離散度を加算
+		recode.remove(recode.size() - 1);	// 棋譜から除去
+		return true;
+	}
+	// 最後に移動したタイルを取得
+	LogicalTile getUndoTile() {
+		int size = recode.size();
+		if (size < 2) return null;
+		Point p = recode.get(size - 2);
+		return tiles[p.x][p.y];
+	}
+	// 最後に移動したタイルをアンドゥする際の方向を取得する
+	Direction getUndoDirection() {
+		Point latest = getUndoTile().lp;
+		if (latest == null) return Direction.NONE;
+		return Direction.direction(latest, hole.lp);
+	}
 
 	// デバッグ用グリッド表示メソッド
 	private void debug(int i, ArrayList<LogicalTile> tile) {
