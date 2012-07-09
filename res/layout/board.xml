@@ -41,6 +41,10 @@
         android:layout_weight="9"
         android:background="#ff000000" >
 
+        <kodemma.android.sliderpuzzle.BackgroundView
+            android:id="@+id/backgroundView"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" />
         <kodemma.android.sliderpuzzle.BoardView
             android:id="@+id/boardView"
             android:layout_width="fill_parent"
