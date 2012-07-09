@@ -1,10 +1,13 @@
 package kodemma.android.sliderpuzzle;
 
 import java.io.InputStream;
+
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -122,9 +125,23 @@ public class SelectLevelActivity extends SharedMenuActivity {
 				e.putString("uri", filename);e.commit();
 
 				InputStream is = getContentResolver().openInputStream(u);
-				bmp = BitmapFactory.decodeStream(is);
+				try {
+					bmp = BitmapFactory.decodeStream(is);
+				} catch (OutOfMemoryError ome) {
+					ome.printStackTrace();
+					// メモリ不足の場合は、ダイアログを表示し、デフォルトのドロイドアイコンの画像を設定する。
+					Resources res = getResources();
+					new AlertDialog.Builder(this)
+						.setTitle(R.string.alart_title_outOfMemoey)
+						.setMessage(R.string.alart_message_outOfMEmory)
+						.setPositiveButton(R.string.str_ok, null)
+						.show();
+					bmp = BitmapFactory.decodeResource(res, R.drawable.ic_launcher);
+				}
 				iv.setImageBitmap(bmp);
-			}catch(Exception e){}
+			}catch(Exception ex){
+				ex.printStackTrace();
+			}
 		}
 	}
 	// =================== Button Click Listener ================= // 
