@@ -38,11 +38,9 @@ class Motion {
 		vertical = v;
 	}
 	void add(Motion m) { x += m.x; y += m.y; d += m.d; }	// 現在位置に移動ベクトルを加算
-	void addX(Motion m) { x += m.x; }
-	void addY(Motion m) { y += m.y; }
-	Motion negateX() { x = -x; return this;}	// 移動ベクトルの反転
-	Motion negateY() { y = -y; return this;}	// 移動ベクトルの反転
-	static Motion randomPosition() {						// 初期位置をランダムに取得
+	Motion negateX() { x = -x; return this; }	// 移動ベクトルの反転
+	Motion negateY() { y = -y; return this; }	// 移動ベクトルの反転
+	static Motion randomPosition() {			// 初期位置をランダムに取得
 		float length = (vertical)? viewSize.x : viewSize.y;
 		length = (float)(length * Math.random());
 		float w, h;
@@ -51,9 +49,9 @@ class Motion {
 		} else {
 			w = 0f; h = length;
 		}
-		return new Motion(w, h, randomDegree(MIN_DEGREE, MAX_DEGREE));
+		return new Motion(w, h, randomScalar(MIN_DEGREE, MAX_DEGREE, true));
 	}
-	static Motion randomVector(Motion pos) {				// 移動ベクトルをランダムに取得
+	static Motion randomVector(Motion pos) {	// 移動ベクトルをランダムに取得
 		double min, max;
 		if (vertical) {
 			min = Math.atan2(-viewSize.y, -pos.x);
@@ -65,18 +63,18 @@ class Motion {
 		double theta = min + (max - min) * Math.random();
 		double x = Math.cos(theta);
 		double y = -Math.sin(theta);
-		double v = randomVeocity(MIN_VELOCITY, MAX_VELOCITY);
-//Log.d("VEC", "x=" + x + ", y=" + y + ", v=" + v);
-		return new Motion((int)(x*v), (int)(y*v), randomDegree(MIN_DEGREE, MAX_DEGREE));
+		double v = randomScalar(MIN_VELOCITY, MAX_VELOCITY, false);
+		return new Motion((int)(x*v), (int)(y*v), randomScalar(MIN_DEGREE, MAX_DEGREE, true));
 	}
-	static float randomDegree(double min, double max) {		// 範囲内のスカラー量をランダムに取得 minusあり
+	// 範囲内のスカラー量をランダムに取得。 includeMinusRange=trueの場合は、マイナス側の範囲も含める。
+	static float randomScalar(double min, double max, boolean includeMinusRange) {
 		double range = max - min;
-		double rand = range*2.0 * Math.random(); 
-		return (float)((rand < min)? min + rand : range - rand - min);
-	}
-	static float randomVeocity(double min, double max) {		// 範囲内のスカラー量をランダムに取得
-		double range = max - min;
-		return (float)(range * Math.random() + min); 
+		if (includeMinusRange) {
+			double rand = range*2.0 * Math.random(); 
+			return (float)((rand < min)? min + rand : range - rand - min);
+		} else {
+			return (float)(range * Math.random() + min); 
+		}
 	}
 }
 // Droid本体
@@ -99,9 +97,9 @@ class Droid {
 		mat.set(initial);
 		mat.postRotate(pos.d);
 		mat.postTranslate(pos.x, pos.y);
-		// まず領域判定
-		if (pos.x < 0 || pos.x > Motion.viewSize.x) {vec.negateX();}
-		if (pos.y < 0 || pos.y > Motion.viewSize.y) {vec.negateY();}
+		// 領域判定
+		if (pos.x < 0 || pos.x > Motion.viewSize.x) { vec.negateX(); }
+		if (pos.y < 0 || pos.y > Motion.viewSize.y) { vec.negateY(); }
 	}
 }
 class DroidFarm {
@@ -124,7 +122,7 @@ class DroidFarm {
 	}
 }
 public class BackgroundView extends View {
-	Bitmap droid;
+	Bitmap bitmap;
 	DroidFarm droidFarm = new DroidFarm();
 	
 	public BackgroundView(Context context) { this(context, null); }
@@ -134,24 +132,18 @@ public class BackgroundView extends View {
 	}
 	@Override protected void onSizeChanged(int w, int h, int pw, int ph) {
 		super.onSizeChanged(w, h, pw, ph);
-		
-		droid = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-		DroidFarm.initialize(droid, w, h, true);
+		bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+		DroidFarm.initialize(bitmap, w, h, true);
 		droidFarm.createDroid();
 		droidFarm.createDroid();
 		droidFarm.createDroid();
 		droidFarm.createDroid();
 		droidFarm.createDroid();
-		droidFarm.createDroid();
-		droidFarm.createDroid();
-		
-		new GradientHandler().start();
+		new DroidHandler().start();
 	}
-	@Override
-	protected void onDraw(Canvas canvas) {
-		droidFarm.drawDroids(canvas);
-	}
-	class GradientHandler extends Handler {
+	@Override protected void onDraw(Canvas canvas) { droidFarm.drawDroids(canvas); }
+	
+	class DroidHandler extends Handler {
 		private static final int INVALIDATE = 1;
 		private static final int INTERVAL = 100;
 		private long nextTime;
@@ -163,9 +155,7 @@ public class BackgroundView extends View {
 		private void sendNextMessage() {
 			Message msg = obtainMessage(INVALIDATE);
 			long current = SystemClock.uptimeMillis();
-			if (nextTime < current) {
-				nextTime = current + INTERVAL;
-			}
+			if (nextTime < current) { nextTime = current + INTERVAL; }
 			sendMessageAtTime(msg, nextTime);
 			nextTime += INTERVAL;
 		}

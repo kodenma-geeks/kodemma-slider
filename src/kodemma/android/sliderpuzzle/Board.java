@@ -35,7 +35,7 @@ class Tile {
 }
 // パズルのゲーム盤を表すクラス
 public class Board {
-	private static final int BORDER_WIDTH = 2;	// タイルの枠線の幅
+	private static final int BORDER_WIDTH = 3;	// タイルの枠線の幅
 	Bitmap bitmap;								// ユーザが選択したビットマップイメージ
 	int rows;									// パズルの行数
 	int cols;									// パズルの列数
@@ -202,7 +202,7 @@ public class Board {
 	// タイルを描画する - 最終的にこのメソッドで描画
 	private void drawTile(Canvas canvas, Rect s, Rect d, String id) {
 //		Log.d("Borad", "d=" + d);
-		if (d.width() == 0) return; // 部分再描画：不具合対応-start
+		if (d.width() <= 10) return; // 部分再描画：不具合対応-start
 		canvas.drawBitmap(bitmap, s, d, null);
 		if (showId) {	// タイルの番号タグを描画する
 			Utils.drawTag(canvas, id, (d.left+d.right)/2, (d.top+d.bottom)/2, textPaint, tagPaint, shadowPaint);
