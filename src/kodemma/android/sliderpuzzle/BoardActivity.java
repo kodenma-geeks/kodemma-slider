@@ -2,6 +2,7 @@ package kodemma.android.sliderpuzzle;
 
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -41,14 +42,17 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		switch(reqcode) {
 		case INTENT_FOR_SELECT_LEVEL:
 			if (result == RESULT_OK) {
-				if (stat != GameStatus.PLAYING) {
-//					Bundle b = it.getExtras();
-//					boardView.board.bitmap = (Bitmap)b.get("PICTURE");
-//					boardView.board.rows = it.getIntExtra("LEVEL",0)+3;
-//					boardView.board.cols = it.getIntExtra("LEVEL",0)+3;
-				}
-				boardView.board.showId = it.getBooleanExtra("HINT",false);
-				boardView.board.isGrid = it.getBooleanExtra("TILE",false);
+				int lv = (SelectLevelActivity.getLevelSetting(this)==0)? 1: SelectLevelActivity.getLevelSetting(this);
+//				int lv = SelectLevelActivity.getLevelSetting(context);
+				boardView.level = Level.levels().get(lv);
+				
+				Uri u = SelectLevelActivity.getImgUriSetting(this);
+				boardView.bitmap = boardView.setImgUriSetting(u, this);
+				
+				boardView.showId = SelectLevelActivity.getHintSetting(this);
+				boardView.isGrid = SelectLevelActivity.getTileSetting(this);
+				
+				boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
 			}
 			break;
 		}

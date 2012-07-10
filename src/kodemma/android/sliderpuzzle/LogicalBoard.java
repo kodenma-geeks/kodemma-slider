@@ -21,28 +21,22 @@ public class LogicalBoard {
 	int totalDistance;
 	LogicalTile[][] tiles;
 	LogicalTile hole;
-//	private int oldMove;
 	private LogicalTile oldMove;			// 前回動かしたタイル
 	private LogicalTile newMove;			// 今回動かすタイル
 	private ArrayList<Point> recode;		// 棋譜
 	private int holeNumber;//shima
-//	int maxDistance;//shima
-//	int shuffleLimit;//shima
+
 	
     Direction direction;
 	
 	LogicalBoard(int r, int c){
-		//---
 		hole = new LogicalTile();
 		oldMove = new LogicalTile();
 		newMove = new LogicalTile();
-		//---
 		row = r;
 		column = c;
 		totalDistance = 0;
 		recode = new ArrayList<Point>();
-//		maxDistance = (int)(r * c * TWICE_VALUE);// shima
-//		shuffleLimit = (int)(maxDistance * LIMIT_VALUE);//shima
 
 		holeNumber = (int) (Math.random() * r * c);	// ブランクを決定
 		
@@ -70,7 +64,6 @@ public class LogicalBoard {
 		final float LIMIT_VALUE = 5.5f;
 		
 		ArrayList<LogicalTile> tile;
-//		oldMove = -1;
 		
 		// シャッフル開始
 //		for (int i = 0; i < (int)(row * column * TWICE_VALUE * LIMIT_VALUE); i++) {
@@ -118,22 +111,22 @@ public class LogicalBoard {
 
 		ArrayList<LogicalTile> canMoveTiles = new ArrayList<LogicalTile>();
 
-		if (0 <= hole.lp.y && hole.lp.y < row) {	// 上下にはみ出さない中から
+//		if (0 <= hole.lp.y && hole.lp.y < row) {	// 上下にはみ出さない中から
 			if (hole.lp.x - 1 >= 0) {	// 左見て
 				canMoveTiles.add(tiles[hole.lp.x - 1][hole.lp.y]);
 			}
 			if (hole.lp.x + 1 < column) {	// 右見て
 				canMoveTiles.add(tiles[hole.lp.x + 1][hole.lp.y]);
 			}
-		}
-		if (0 <= hole.lp.x && hole.lp.x < column) {	// 左右にはみ出さない中から
+//		}
+//		if (0 <= hole.lp.x && hole.lp.x < column) {	// 左右にはみ出さない中から
 			if (hole.lp.y - 1 >= 0) {	// 上見て
 				canMoveTiles.add(tiles[hole.lp.x][hole.lp.y - 1]);
 			}
 			if (hole.lp.y + 1 < row) {	// 下見て
 				canMoveTiles.add(tiles[hole.lp.x][hole.lp.y + 1]);
 			}
-		}
+//		}
 		return canMoveTiles;
 	}
 
@@ -209,18 +202,6 @@ public class LogicalBoard {
 			hole.lp = pointTmp.lp;
 			// 棋譜への追加
 			recode.add(hole.lp); // added by shima
-
-//			tmp.lp = tiles[hole.lp.x][hole.lp.y].lp;
-//			tiles[hole.lp.x][hole.lp.y].lp = tiles[logTil.lp.x][logTil.lp.y].lp;
-//			tiles[logTil.lp.x][logTil.lp.y].lp = tiles[tmp.lp.x][tmp.lp.y].lp;
-			
-//			tmp.lp = tiles[hole.lp.x][hole.lp.y].lp;
-//			tiles[logTil.lp.x][logTil.lp.y].lp = tiles[logTil.lp.x][logTil.lp.y].lp;
-//			tiles[tmp.lp.x][tmp.lp.y].lp = tiles[tmp.lp.x][tmp.lp.y].lp;
-			
-//			tmp.lp.set(hole.lp.x, hole.lp.y);
-//			tiles[lt.lp.x][lt.lp.y].lp.set(lt.lp.x, lt.lp.y);
-//			tiles[tmp.lp.x][tmp.lp.y].lp.set(tmp.lp.x, tmp.lp.y);
 
 			totalDistance += getDistance(logTil);	// 今回距離
 

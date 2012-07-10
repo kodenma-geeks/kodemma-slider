@@ -68,7 +68,7 @@ public class BoardView extends View implements AnimationListener {
 //	int cols; // 浜田　7/5
 //	int small; // 浜田　7/5
 //	int large; // 浜田　7/5
-	Level lv; // 浜田　7/5
+	Level level; // 浜田　7/5
 	private List<Tile> movables = new ArrayList<Tile>();	// スライドするタイル群
 	private Set<Tile> movablesSet = new HashSet<Tile>(); 
 	private GameStatus gameStatus = GameStatus.WAITING;
@@ -89,29 +89,32 @@ public class BoardView extends View implements AnimationListener {
 		shieldPaint.setColor(Color.BLUE);
 		shieldPaint.setAlpha(128);
 
-//		int l = (SelectLevelActivity.getLevelSetting(context)==0)? 1: SelectLevelActivity.getLevelSetting(context);
-		int l = SelectLevelActivity.getLevelSetting(context);
-		lv = Level.levels().get(l);
-		
+		int lv = (SelectLevelActivity.getLevelSetting(context)==0)? 1: SelectLevelActivity.getLevelSetting(context);
+//		int lv = SelectLevelActivity.getLevelSetting(context);
+		level = Level.levels().get(lv);
+
 		Uri u = SelectLevelActivity.getImgUriSetting(context);
+		bitmap = setImgUriSetting(u, context);
+		showId = SelectLevelActivity.getHintSetting(context);
+		isGrid = SelectLevelActivity.getTileSetting(context);
+	}
+	// Uriからの画像メソッド
+	protected Bitmap setImgUriSetting(Uri u, Context cn) {
 		InputStream inputStream = null;
 		try {
-			ContentResolver contentResolver = context.getContentResolver();
+			ContentResolver contentResolver = cn.getContentResolver();
 			inputStream = contentResolver.openInputStream(u);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		bitmap = BitmapFactory.decodeStream(inputStream);
-//		bitmap = BitmapFactory.getBitmapFromUri(u);
-		showId = SelectLevelActivity.getHintSetting(context);
-		isGrid = SelectLevelActivity.getTileSetting(context);
+		return BitmapFactory.decodeStream(inputStream);
 	}
 	@Override protected void onSizeChanged(int w, int h, int pw, int ph) {
 		super.onSizeChanged(w, h, pw, ph);
 		shield = new Rect(0, 0, w, h);
 		
 // 		bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.sky);
-		board = new Board(bitmap, Utils.getColRow(bitmap, lv).y,  Utils.getColRow(bitmap, lv).x, w, h, showId,isGrid);
+		board = new Board(bitmap, Utils.getColRow(bitmap, level).y,  Utils.getColRow(bitmap, level).x, w, h, showId,isGrid);
 //		board = new Board(bitmap, rows, cols, w, h);
 		board.initializeTiles();
 // 		board.shuffle();
@@ -147,7 +150,11 @@ public class BoardView extends View implements AnimationListener {
 					splashListener.onUndoStarted();
 				}
 			}
-			SoundEffect.getSound(SoundEffect.sound_Up);
+//			SoundEffect.getSound(SoundEffect.sound_Up);
+			if(vec.x != 0 || vec.y != 0){	// 動かさなかった時は音を鳴らさない　7/10　浜田
+				SoundEffect.getSound(SoundEffect.sound_Up);
+			}
+
 			DRAW_ALL = true; // 部分再描画：不具合対応-start
 			//invalidate(invalidated); 部分再描画：不具合対応-start
 			invalidate();

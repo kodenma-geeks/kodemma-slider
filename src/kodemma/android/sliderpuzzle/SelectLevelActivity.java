@@ -39,21 +39,27 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	boolean isGrid;		// 浜田　追記7/5
 	String filename;	// 浜田　追記7/5
 	Bitmap bmp;			// 浜田　追記7/5
-	GameStatus status;	// 浜田　追記7/5
+//	GameStatus status;	// 浜田　追記7/5
 	
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.setting);
 		// level spinner ---------------------------------------
 		spnlvl = (Spinner) this.findViewById(R.id.spinner1);
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.ary_lv, android.R.layout.simple_spinner_item);
+
+		String[] str = new String[10];
+		int i=0;
+		for (Level v : Level.levels().values()) { str[i]=v.text(); i++;}
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, str);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 		it = getIntent();	// 浜田　追記7/5
-		isHint = it.getBooleanExtra("HINT", true);	// 浜田　追記7/5
-		isGrid = it.getBooleanExtra("TILE", true);	// 浜田　追記7/6
-		Bundle b = it.getExtras();	// 浜田　追記7/5
-		status = (GameStatus)b.get("STATUS");	// 浜田　追記7/5
+//		isHint = it.getBooleanExtra("HINT", true);	// 浜田　追記7/5
+//		isGrid = it.getBooleanExtra("TILE", true);	// 浜田　追記7/6
+//		Bundle b = it.getExtras();	// 浜田　追記7/5
+//		status = (GameStatus)b.get("STATUS");	// 浜田　追記7/5
+
 
 		spnlvl.setAdapter(adapter);
 		spnlvl.setPromptId(R.string.conf_level);
@@ -69,7 +75,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 
 			public void onNothingSelected(AdapterView<?> v) {}
 		});
-		if(status == GameStatus.PLAYING) spnlvl.setEnabled(false);	// 浜田　追記7/5
+//		if(status == GameStatus.PLAYING) spnlvl.setEnabled(false);	// 浜田　追記7/5
 
 		// hint ------------------------------------------------
 		cbhint = (CheckBox) this.findViewById(R.id.checkBox1);
@@ -90,7 +96,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 				SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
 				Editor e = pref.edit();
 				isGrid = cbtile.isChecked()? true : false; // 浜田　 書き方を修正 7/5
-				e.putBoolean("hint", isGrid); e.commit();
+				e.putBoolean("tile", isGrid); e.commit();
 //				if (cbhint.isChecked() == true) { e.putBoolean("tile", true); e.commit(); }
 //				else if (cbhint.isChecked() == false) { e.putBoolean("tile", false); e.commit(); }
 			}
@@ -141,6 +147,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 				iv.setImageBitmap(bmp);
 			}catch(Exception ex){
 				ex.printStackTrace();
+				bmp = BitmapFactory.decodeResource(getResources(),R.drawable.sky);
 			}
 		}
 	}
@@ -151,8 +158,8 @@ public class SelectLevelActivity extends SharedMenuActivity {
 			case R.id.button2:
 				// button Play Activity Call"level", res
 //				it.putExtra("LEVEL", res);
-				it.putExtra("HINT", isHint);
-				it.putExtra("TILE", isGrid);
+//				it.putExtra("HINT", isHint);
+//				it.putExtra("TILE", isGrid);
 //				it.putExtra("PICTURE", bmp);
 				setResult(RESULT_OK, it);
 				finish();
