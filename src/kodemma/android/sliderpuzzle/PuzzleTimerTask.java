@@ -62,7 +62,7 @@ public class PuzzleTimerTask extends TimerTask{
 		if(puzzleTimer == null){
 			timerTask = new PuzzleTimerTask(displayed);
 			puzzleTimer = new Timer(true);
-			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
+			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 500);
 		}
 	}
 	public void timerStop(){
