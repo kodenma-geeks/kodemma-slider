@@ -140,7 +140,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 			Intent it = null;
 			if( v == btnPlayActCall ){ it = new Intent(SelectLevelActivity.this, BoardActivity.class);}
 //			else if( v == btnRankingActCall ){ it = new Intent(SelectLevelActivity.this, RankingActivity.class);}
-//			else if( v == btnTitleActCall ){ it = new Intent(SelectLevelActivity.this, TitleActivity.class);}
+			else if( v == btnTitleActCall ){ it = new Intent(SelectLevelActivity.this, TitleActivity.class);}
 			startActivity(it);
 		}
 	}
