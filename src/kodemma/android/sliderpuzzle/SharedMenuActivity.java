@@ -1,5 +1,8 @@
 package kodemma.android.sliderpuzzle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -8,6 +11,19 @@ import android.view.MenuItem;
 
 public class SharedMenuActivity extends Activity{
 
+	// 本クラスを継承するすべてのアクティビティ・インスタンスを保持するリスト
+	private static List<Activity> activities = new ArrayList<Activity>();
+	
+	protected SharedMenuActivity() {
+		super();
+		activities.add(this);	// このコンストラクタで、自身のインスタンスをリストに登録する。
+	}
+	// 自身も含めたすべてのアクティビティを終了する
+	protected void killAllActivities() {
+		activities.remove(this);						// 全アクティビティリストから自身を除去する。
+		for (Activity a : activities) { a.finish(); }	// 自身以外の全アクティビティを終了する
+		finish();	
+	}
 	@Override public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);
 		getMenuInflater().inflate(R.menu.menu, menu);
@@ -26,7 +42,10 @@ public class SharedMenuActivity extends Activity{
 		builder.setPositiveButton(R.string.str_ok, new android.content.DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
 				setResult(RESULT_OK);
-				finish();
+				killAllActivities();	// 自身も含めたすべてのアクティビティを終了する
+//				activities.remove(this);						// 全アクティビティリストから自身を除去する。
+//				for (Activity a : activities) { a.finish(); }	// 自身以外の全アクティビティを終了する
+//				finish();										// 自身のアクティビティを終了する
 			}
 		});
 		builder.setNegativeButton(R.string.str_cancel, null).create().show();

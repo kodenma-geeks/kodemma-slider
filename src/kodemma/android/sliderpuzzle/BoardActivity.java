@@ -1,7 +1,11 @@
 package kodemma.android.sliderpuzzle;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Intent;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -12,9 +16,9 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	private static final int INTENT_FOR_SELECT_LEVEL = 1;
 	private BoardView boardView;
 	private TextView slideCounterView;
-	private TextView chronometerView;
-	
+	private TextView chronometerView;	
 	private PuzzleTimerTask chronometer;
+	private Map<Integer, Button> buttonMap;
 	
 //	private Board board;	// 浜田　追記7/5
 //	private BoardViewListener boardViewListener;	// 浜田　追記7/5
@@ -36,7 +40,13 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onStop(){
 		super.onStop();
+		chronometer.timerPause();
 		SoundEffect.soundStop();
+	}
+	public void onRestart(){
+		super.onRestart();
+		chronometer.timerResume();
+		stat = GameStatus.WAITING;
 	}
 	public void onActivityResult(int reqcode, int result, Intent it) {
 		switch(reqcode) {
@@ -69,50 +79,63 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onGameSolved(int rows, int cols, int slides) {
 		// ここでランキング画面へ遷移する
-//		Intent it = new Intent(BoardActivity.this, RankingActivity.class);
-//		it.putExtra("Laptime", PuzzleTimerTask.lapTime);
-//		it.putExtra("Slidecount", slides);
-//		it.putExtra("panels", rows*cols);
-//		startActivity(it);
+//		Intent it_for_ranking = new Intent(BoardActivity.this, RankingActivity.class);
+//		it_for_ranking.putExtra("Laptime", PuzzleTimerTask.lapTime);
+//		it_for_ranking.putExtra("Slidecount", slides);
+//		it_for_ranking.putExtra("panels", rows*cols);
+//		startActivity(it_for_ranking);
 	}
 	private class ButtonClickListener implements View.OnClickListener {
 		private ButtonClickListener() {
+			buttonMap = new HashMap<Integer, Button>();
 			TypedArray tArray = getResources().obtainTypedArray(R.array.boardButtons);
 			for (int i=0; i<tArray.length(); i++) {
 				int resourceId = tArray.getResourceId(i, 0);
 				Button button = (Button)findViewById(resourceId);
 				button.setOnClickListener(this);
+				buttonMap.put(resourceId, button);
 			}
-		}
-		public void onClick(View v) {
+		}		
+		public void onClick(View v) {		
 			switch (v.getId()) {
 			case R.id.board_button_start:
 				boardView.startButtonPressed();
+				buttonMap.get(R.id.board_button_start).setText(R.string.board_button_restart);
 				chronometer.timerStart();
 				SoundEffect.getSound(SoundEffect.sound_Button_on);
 				break;
 			case R.id.board_button_pause:
 				stat = boardView.pauseButtonPressed();
 				if (stat == GameStatus.PAUSED) {
+					buttonMap.get(R.id.board_button_pause).setText(R.string.board_button_resume);
 					SoundEffect.getSound(SoundEffect.sound_Button_on);
 					chronometer.timerPause();
+					buttonMap.get(R.id.board_button_start).setEnabled(false);
+					buttonMap.get(R.id.board_button_setting).setEnabled(false);
+					buttonMap.get(R.id.board_button_title).setEnabled(false);
 				} else if (stat == GameStatus.PLAYING) {
+					buttonMap.get(R.id.board_button_pause).setText(R.string.board_button_pause);
 					SoundEffect.getSound(SoundEffect.sound_Button_off);
 					chronometer.timerResume();
+					buttonMap.get(R.id.board_button_start).setEnabled(true);
+					buttonMap.get(R.id.board_button_setting).setEnabled(true);
+					buttonMap.get(R.id.board_button_title).setEnabled(true);
 				}
 				break;
 			case R.id.board_button_setting:
 				SoundEffect.getSound(SoundEffect.sound_Button_on);
-				Intent it = new Intent(BoardActivity.this, SelectLevelActivity.class);
-				it.putExtra("STATUS", stat);
-//				it.putExtra("HINT", boardView.board.showId);
-//				it.putExtra("PICTURE", boardView.board.bitmap);
-				startActivityForResult(it, INTENT_FOR_SELECT_LEVEL);
+				Intent it_for_setting = new Intent(BoardActivity.this, SelectLevelActivity.class);
+				it_for_setting.putExtra("STATUS", stat);
+//				it_for_setting.putExtra("HINT", boardView.board.showId);
+//				it_for_setting.putExtra("PICTURE", boardView.board.bitmap);
+				startActivityForResult(it_for_setting, INTENT_FOR_SELECT_LEVEL);
 				break;
-			case R.id.board_button_answer:
-				stat = boardView.undoButtonPressed();
-				break;
-			case R.id.board_button_suspend:
+			case R.id.board_button_title:
+				SoundEffect.getSound(SoundEffect.sound_Button_on);
+				Intent it_for_title = new Intent(BoardActivity.this, TitleActivity.class);
+				startActivity(it_for_title);
+				
+//				stat = boardView.undoButtonPressed();
 				break;
 			}
 		}

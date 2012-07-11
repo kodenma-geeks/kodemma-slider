@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
-public class TitleActivity extends Activity {
+public class TitleActivity extends SharedMenuActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,7 +50,8 @@ public class TitleActivity extends Activity {
 		});
 		image4.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				finish();
+				//finish();
+				killAllActivities();	// 自身も含めたすべてのアクティビティを終了する
 			}
 		});
 

@@ -9,7 +9,7 @@ public class PuzzleTimerTask extends TimerTask{
 
 	private PuzzleTimerTask timerTask;
 	private Timer puzzleTimer;
-	static long lapTime;
+	static long lapTime, startTime, pauseTime;
 	TextView displayed;
 
 	final Handler hn = new Handler();
@@ -18,12 +18,15 @@ public class PuzzleTimerTask extends TimerTask{
 		super();
 		displayed = disp;
 	}
-//1/10秒ごとに100ミリ秒インクリメント
+
 	public void run() {
 		hn.post(new Runnable() {
 			public void run() {
 
-				lapTime += 100;
+				long currentTime = System.currentTimeMillis();
+				lapTime = currentTime-startTime+pauseTime;
+				
+
 				//秒数を60で割って余りを秒数に表示、以下分と時間も同じ
 				long time = lapTime;
 				time /= 1000;
@@ -39,13 +42,16 @@ public class PuzzleTimerTask extends TimerTask{
 	}
 //スタート、リスタートごとにTimerTaskを生成（一度キャンセルして止めると再利用できない為）
 	public void timerStart() {
+		startTime = System.currentTimeMillis();
 		if (puzzleTimer == null) {
+			pauseTime = 0;
 			lapTime = 0;
 			timerTask = new PuzzleTimerTask(displayed);
 			puzzleTimer = new Timer(true);
 			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
 		} else if (puzzleTimer != null) {
 			puzzleTimer.cancel();
+			pauseTime = 0;
 			lapTime = 0;
 			timerTask = new PuzzleTimerTask(displayed);
 			puzzleTimer = new Timer(true);
@@ -56,13 +62,15 @@ public class PuzzleTimerTask extends TimerTask{
 		if(puzzleTimer != null){
 			puzzleTimer.cancel();
 			puzzleTimer = null;
+			pauseTime = lapTime;
 		}
 	}
 	public void timerResume(){
 		if(puzzleTimer == null){
 			timerTask = new PuzzleTimerTask(displayed);
 			puzzleTimer = new Timer(true);
-			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 500);
+			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
+			startTime = System.currentTimeMillis();
 		}
 	}
 	public void timerStop(){
@@ -70,7 +78,7 @@ public class PuzzleTimerTask extends TimerTask{
 			puzzleTimer.cancel();
 			puzzleTimer = null;
 			lapTime = 0;
+			displayed.setText(String.format("%02d:%02d:%02d", 0, 0, 0));
 		}
 	}
 }
-

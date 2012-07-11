@@ -4,16 +4,12 @@
     <item type="id" name="board_button_start"></item>
     <item type="id" name="board_button_pause"></item>
     <item type="id" name="board_button_setting"></item>
-    <item type="id" name="board_button_answer"></item>
-    <item type="id" name="board_button_suspend"></item>
+    <item type="id" name="board_button_title"></item>
     <!-- * Array of Buttons * -->
     <integer-array name="boardButtons">
 	    <item>@id/board_button_start</item>
 	    <item>@id/board_button_pause</item>
 	    <item>@id/board_button_setting</item>
-	    <item>@id/board_button_answer</item>
-<!--
-	    <item>@id/board_button_suspend</item>
--->
+	    <item>@id/board_button_title</item>
     </integer-array>
 </resources>

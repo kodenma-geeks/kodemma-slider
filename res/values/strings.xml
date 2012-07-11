@@ -10,8 +10,7 @@
     <string name="board_button_pause">Pause</string>
     <string name="board_button_resume">Resume</string>
     <string name="board_button_setting">Setting</string>
-    <string name="board_button_answer">Answer</string>
-    <string name="board_button_suspend">Suspend</string>
+    <string name="board_button_title">Title</string>
     
     <!-- *** config resource *** -->
     <string name="menu_exit">Exit</string>
