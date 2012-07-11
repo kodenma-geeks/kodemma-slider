@@ -202,7 +202,7 @@ public class Board {
 	// タイルを描画する - 最終的にこのメソッドで描画
 	private void drawTile(Canvas canvas, Rect s, Rect d, String id) {
 //		Log.d("Borad", "d=" + d);
-		if (d.width() <= 10) return; // 部分再描画：不具合対応-start
+		if (d.width() <= 1) return; // 部分再描画：不具合対応-start
 		canvas.drawBitmap(bitmap, s, d, null);
 		if (showId) {	// タイルの番号タグを描画する
 			Utils.drawTag(canvas, id, (d.left+d.right)/2, (d.top+d.bottom)/2, textPaint, tagPaint, shadowPaint);

@@ -140,7 +140,12 @@ public class BoardView extends View implements AnimationListener {
 			// 部分再描画：不具合対応-end
 			break;
 		case MotionEvent.ACTION_UP:
-			if (vec == null) break;
+			//Log.d(TAG, "sp=" + sp + ", ep=" + ep + ", vec=" + vec);
+			if (vec == null) {
+				movablesSet.clear();	// バックグラウンドでドロイドが動いていると、その間ずっとinvalidate()がシステムより発せられているため、
+										// このリストがあると、リストに含まれているタイルが消えてしまうので、クリアするようにした。
+				break;
+			}
 			if (Utils.isSlided(vec, limiter)) {
 				for (Tile t : movables) board.slide(t);
 				boardViewListener.onTileSlided(board.slideCount);

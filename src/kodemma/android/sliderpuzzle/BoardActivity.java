@@ -15,6 +15,7 @@ import android.widget.TextView;
 public class BoardActivity extends SharedMenuActivity implements BoardViewListener {
 	private static final int INTENT_FOR_SELECT_LEVEL = 1;
 	private BoardView boardView;
+	private BackgroundView backgroundView;
 	private TextView slideCounterView;
 	private TextView chronometerView;	
 	private PuzzleTimerTask chronometer;
@@ -28,6 +29,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.board);
 		boardView = (BoardView)findViewById(R.id.boardView);
+		backgroundView = (BackgroundView)findViewById(R.id.backgroundView);
 		boardView.boardViewListener = this;
 		slideCounterView = (TextView)findViewById(R.id.slideCounter);
 		chronometerView = (TextView)findViewById(R.id.chronometer);
@@ -69,6 +71,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onTileSlided(int count) {
 		slideCounterView.setText(String.valueOf(count));
+		backgroundView.slided();
 	}
 	public void onChronometerSwitched(boolean on) {
 		if (on) {
@@ -102,6 +105,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				boardView.startButtonPressed();
 				buttonMap.get(R.id.board_button_start).setText(R.string.board_button_restart);
 				chronometer.timerStart();
+				backgroundView.shuffled(boardView.bitmap);
 				SoundEffect.getSound(SoundEffect.sound_Button_on);
 				break;
 			case R.id.board_button_pause:

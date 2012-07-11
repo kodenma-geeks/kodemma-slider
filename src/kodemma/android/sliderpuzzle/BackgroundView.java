@@ -3,6 +3,7 @@ package kodemma.android.sliderpuzzle;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,7 +18,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-// Droidの位置、または移動ベクトルを表すクラス
+// Droid の位置、または移動ベクトルを表すクラス
 class Motion {
 	private static final float MIN_DEGREE = 2f;
 	private static final float MAX_DEGREE = 10f;
@@ -25,7 +26,7 @@ class Motion {
 	private static final float MAX_VELOCITY = 12f;
 	static PointF viewSize;			// BackgroundViewのサイズ
 	private static boolean vertical = true;	// Droidが降る方向
-	float x, y;	// 位置
+	float x, y;	// 位置、または移動ベクトル
 	float d;	// 回転角度
 	Motion(float xx, float yy, float dd) { x = xx; y = yy; d = dd; }
 	static void initialize(int w, int h, boolean v) {
@@ -47,7 +48,7 @@ class Motion {
 		if (vertical) {
 			w = length; h = 0f;
 		} else {
-			w = 0f; h = length;
+			h = length; w = 0f;
 		}
 		return new Motion(w, h, randomScalar(MIN_DEGREE, MAX_DEGREE, true));
 	}
@@ -76,13 +77,16 @@ class Motion {
 			return (float)(range * Math.random() + min); 
 		}
 	}
+	@Override public String toString() {	// デバッグ用
+		return "{x=" + x + ", y=" + y + ", d=" + d + "}";
+	}
 }
-// Droid本体
+// Droid 本体
 class Droid {
 	static Bitmap bitmap;
 	static Matrix initial = new Matrix();	// 回転の中心をビットマップの中心にするためのマトリックス
 	Motion pos;	// 現在位置
-	Motion vec;	// ベクトル（一回移動分
+	Motion vec;	// ベクトル（一回移動分）
 	Matrix mat = new Matrix();
 	Droid(Motion p, Motion v) { pos = p; vec = v; }
 	static void initialize(Bitmap b) {
@@ -91,8 +95,7 @@ class Droid {
 		initial.setTranslate(bitmap.getWidth()/-2, bitmap.getHeight()/-2);
 	}
 	void move() {	// １フレーム分の移動を行う
-		// 移動
-		pos.add(vec);
+		pos.add(vec);	// 移動
 		// マトリックス更新
 		mat.set(initial);
 		mat.postRotate(pos.d);
@@ -101,57 +104,76 @@ class Droid {
 		if (pos.x < 0 || pos.x > Motion.viewSize.x) { vec.negateX(); }
 		if (pos.y < 0 || pos.y > Motion.viewSize.y) { vec.negateY(); }
 	}
+	@Override public String toString() {	// デバッグ用
+		return "{pos=" + pos + ", vec=" + vec + ", mat=" + mat + "}";
+	}
 }
+// Droid 牧場
 class DroidFarm {
-	private static final int MAX_DROIDS = 20;
+	private static final int MAX_DROIDS = 10;
 	List<Droid> droids = new ArrayList<Droid>();
 	Paint paint	= new Paint(Paint.ANTI_ALIAS_FLAG);
-	static void initialize(Bitmap b, int w, int h, boolean v) {
-		Motion.initialize(w, h, v);
-		Droid.initialize(b);
-	}
 	void moveDroids() { for (Droid d : droids) { d.move(); } }
 	void drawDroids(Canvas canvas) {
-		for (Droid d : droids) { canvas.drawBitmap(Droid.bitmap, d.mat, paint); }
+		for (Droid d : droids) {
+//			Log.d("AA", "droid=" + d);
+			canvas.drawBitmap(Droid.bitmap, d.mat, paint);
+		}
 	}
 	void createDroid() {
-		if (droids.size() > MAX_DROIDS) return;
 		Motion pos = Motion.randomPosition();
 		Motion vec = Motion.randomVector(pos);
-		droids.add(new Droid(pos, vec));
+		Droid droid = new Droid(pos, vec);
+		droid.move();
+		droids.add(droid);
+		if (droids.size() > MAX_DROIDS) {
+			Droid removed = droids.remove(0);
+			removed = null;
+		}
 	}
+	void clearDroids() { droids.clear(); }
 }
 public class BackgroundView extends View {
-	Bitmap bitmap;
+	private static final float APPEARANCE_ODDS = 0.1f;	// 	Droid の出現確率
 	DroidFarm droidFarm = new DroidFarm();
+	DroidHandler droidHandler = new DroidHandler();
 	
 	public BackgroundView(Context context) { this(context, null); }
 	public BackgroundView(Context context, AttributeSet attrs) {
 		super(context, attrs);	
-		setFocusable(true);
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+		Droid.initialize(bitmap);
 	}
 	@Override protected void onSizeChanged(int w, int h, int pw, int ph) {
 		super.onSizeChanged(w, h, pw, ph);
-		bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
-		DroidFarm.initialize(bitmap, w, h, true);
-		droidFarm.createDroid();
-		droidFarm.createDroid();
-		droidFarm.createDroid();
-		droidFarm.createDroid();
-		droidFarm.createDroid();
-		new DroidHandler().start();
+//		BoardView v = (BoardView)((Activity)getContext()).findViewById(R.id.boardView);
+//		Bitmap b = v.bitmap;
+//		boolean vertical = w/h > b.getWidth()/b.getHeight();
+//		Motion.initialize(w, h, !vertical);
 	}
 	@Override protected void onDraw(Canvas canvas) { droidFarm.drawDroids(canvas); }
+	void shuffled(Bitmap b) {
+		boolean vertical = getWidth()/getHeight() > b.getWidth()/b.getHeight();
+		Motion.initialize(getWidth(), getHeight(), !vertical);
+		droidFarm.clearDroids();
+		droidHandler.stop();
+		if (Utils.lot(APPEARANCE_ODDS)) { droidHandler.start(); }
+	}
+	void slided() { if (droidHandler.active()) { droidFarm.createDroid(); } }
 	
 	class DroidHandler extends Handler {
 		private static final int INVALIDATE = 1;
 		private static final int INTERVAL = 100;
 		private long nextTime;
+		private boolean stop = true;
 		void start() {
+			stop = false;
 			Message msg = obtainMessage(INVALIDATE);
 			nextTime = SystemClock.uptimeMillis();
 			sendMessageAtTime(msg, nextTime);
 		}
+		void stop() { stop = true; }
+		boolean active() { return !stop; }
 		private void sendNextMessage() {
 			Message msg = obtainMessage(INVALIDATE);
 			long current = SystemClock.uptimeMillis();
@@ -161,6 +183,7 @@ public class BackgroundView extends View {
 		}
 		@Override public void handleMessage(Message msg){
 			if (msg.what == INVALIDATE) {
+				if (stop) return;
 				droidFarm.moveDroids();
 				invalidate();
 				sendNextMessage();

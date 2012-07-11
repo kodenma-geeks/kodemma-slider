@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
+// 方向を表す列挙型
 enum Direction {
 	NONE, UP, DOWN, RIGHT, LEFT, OTHER;
 	public boolean virtical() { return this == UP || this == DOWN; }
@@ -23,10 +24,16 @@ enum Direction {
 		return OTHER;
 	}
 }
+// ユーティリティメソッドを集めたクラス 
 public class Utils {
-	public static String getResourceUri(int resourceId) {
-		return "android.resource://" + Utils.class.getPackage().getName() + "/" + resourceId;
-	}
+	private static final String PACKAGE_NAME = Utils.class.getPackage().getName();
+	private static final String URI_SCHEME = "android.resource://";
+	
+	// 指定された確率（odds:0.0～1.0)のくじを引いて、当たればtrueが返る。
+	public static boolean lot(float odds) { return Math.random() < odds; }
+	// 指定されたIDのリソースを示すURIを取得する
+	public static String getResourceUri(int resId) { return URI_SCHEME + PACKAGE_NAME + "/" + resId; }
+	// src矩形の全体を、縦横比を変えずに、dst矩形にフィットさせるためのマトリックスを計算する。
 	public static Matrix adjustingMatrix(float srcWidth, float srcHeight, float dstWidth, float dstHeight) {
 		float scale;
 		float dx = 0f, dy = 0f;
@@ -54,13 +61,16 @@ public class Utils {
 		}
 		return new Point(col, row);
 	}
-	public static int getScore(Level lv, long ms, int count) {
-		final int BONUS = 10000;	// スコアが適度な値になるためのボーナス値
-		final int PANEL_VALUE = 120;// パネル１枚ごとに与えられる点数
-		int time = (int)ms/1000;	// ミリ秒から秒へ変換
-		int score = (BONUS/count)*(lv.tiles()*PANEL_VALUE)/time;
-		return score;
-	}
+	// Levelクラスに移動した
+//	public static int getScore(Level lv, long ms, int count) {
+//		final int BONUS = 10000;	// スコアが適度な値になるためのボーナス値
+//		final int PANEL_VALUE = 120;// パネル１枚ごとに与えられる点数
+//		int time = (int)ms/1000;	// ミリ秒から秒へ変換
+//		int score = (BONUS/count)*(lv.tiles()*PANEL_VALUE)/time;
+//		return score;
+//	}
+	// フリップの始点(sp)、終点(ep)から、その水平または垂直ベクトルをPointとして取得する。
+	// 但し、limiterの値が最大値、または最小値となるように制限される。
 	public static Point getAdjustedVector(Point sp, Point ep, Point limiter) {
 		Point vec = new Point(ep.x - sp.x, ep.y - sp.y);
 		if (limiter.x == 0) {
