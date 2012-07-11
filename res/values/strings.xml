@@ -21,16 +21,10 @@
     <string name="conf_tile">TILE On/Off</string>
     <string name="conf_pict">Select BackGround Picture</string>
     <string name="str_confirm">Confirm</string>
-    <string name="str_ok">OK</string>
+    <string name="str_ok">Ok</string>
     <string name="str_cancel">Cancel</string>
-    <string-array name="ary_lv">
-        <item >Lv.1 ( 3 x 3 )</item>
-        <item >Lv.2 ( 4 x 4 )</item>
-        <item >Lv.3 ( 5 x 5 )</item>
-    </string-array>
     
     <!-- *** dialog message *** -->
     <string name="alart_title_outOfMemoey">Out of Memory</string>
     <string name="alart_message_outOfMEmory">メモリが不足しています。小さな画像を選択してください。</string>
-    
 </resources>
