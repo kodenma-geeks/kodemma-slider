@@ -134,7 +134,7 @@ class DroidFarm {
 	void clearDroids() { droids.clear(); }
 }
 public class BackgroundView extends View {
-	private static final float APPEARANCE_ODDS = 0.1f;	// 	Droid の出現確率
+	private static final float APPEARANCE_ODDS = 0.05f;	// 	Droid の出現確率
 	DroidFarm droidFarm = new DroidFarm();
 	DroidHandler droidHandler = new DroidHandler();
 	
@@ -146,15 +146,11 @@ public class BackgroundView extends View {
 	}
 	@Override protected void onSizeChanged(int w, int h, int pw, int ph) {
 		super.onSizeChanged(w, h, pw, ph);
-//		BoardView v = (BoardView)((Activity)getContext()).findViewById(R.id.boardView);
-//		Bitmap b = v.bitmap;
-//		boolean vertical = w/h > b.getWidth()/b.getHeight();
-//		Motion.initialize(w, h, !vertical);
 	}
 	@Override protected void onDraw(Canvas canvas) { droidFarm.drawDroids(canvas); }
 	void shuffled(Bitmap b) {
-		boolean vertical = getWidth()/getHeight() > b.getWidth()/b.getHeight();
-		Motion.initialize(getWidth(), getHeight(), !vertical);
+		boolean vertically = Utils.verticallyFit(b.getWidth(), b.getHeight(), getWidth(), getHeight());
+		Motion.initialize(getWidth(), getHeight(), !vertically);
 		droidFarm.clearDroids();
 		droidHandler.stop();
 		if (Utils.lot(APPEARANCE_ODDS)) { droidHandler.start(); }

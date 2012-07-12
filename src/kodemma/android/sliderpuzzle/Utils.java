@@ -1,6 +1,14 @@
 package kodemma.android.sliderpuzzle;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -8,6 +16,7 @@ import android.graphics.Paint.FontMetrics;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.net.Uri;
 
 // 方向を表す列挙型
 enum Direction {
@@ -37,10 +46,10 @@ public class Utils {
 	public static Matrix adjustingMatrix(float srcWidth, float srcHeight, float dstWidth, float dstHeight) {
 		float scale;
 		float dx = 0f, dy = 0f;
-		if (dstWidth/dstHeight > srcWidth/srcHeight) {	// vertically fit
+		if (verticallyFit(srcWidth, srcHeight, dstWidth, dstHeight)) {
 			scale = dstHeight/srcHeight;
 			dx = (dstWidth - scale*srcWidth) / 2f;
-		} else {										// horizontally fit
+		} else {
 			scale = dstWidth/srcWidth;
 			dy = (dstHeight - scale*srcHeight) / 2f;
 		}
@@ -48,6 +57,10 @@ public class Utils {
 		matrix.setScale(scale, scale);
 		matrix.postTranslate(dx, dy);
 		return matrix;
+	}
+	// 縦方向にフィットするかどうか
+	public static boolean verticallyFit(float srcWidth, float srcHeight, float dstWidth, float dstHeight) {
+		return (dstWidth/dstHeight > srcWidth/srcHeight);
 	}
 	public static Point getColRow(Bitmap b, Level lv) {
 		int col;
@@ -61,14 +74,6 @@ public class Utils {
 		}
 		return new Point(col, row);
 	}
-	// Levelクラスに移動した
-//	public static int getScore(Level lv, long ms, int count) {
-//		final int BONUS = 10000;	// スコアが適度な値になるためのボーナス値
-//		final int PANEL_VALUE = 120;// パネル１枚ごとに与えられる点数
-//		int time = (int)ms/1000;	// ミリ秒から秒へ変換
-//		int score = (BONUS/count)*(lv.tiles()*PANEL_VALUE)/time;
-//		return score;
-//	}
 	// フリップの始点(sp)、終点(ep)から、その水平または垂直ベクトルをPointとして取得する。
 	// 但し、limiterの値が最大値、または最小値となるように制限される。
 	public static Point getAdjustedVector(Point sp, Point ep, Point limiter) {

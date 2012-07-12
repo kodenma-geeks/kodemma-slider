@@ -78,10 +78,13 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				int lv = (SelectLevelActivity.getLevelSetting(this)==0)? 1: SelectLevelActivity.getLevelSetting(this);
 				if(lv != oldLevel)isChange = true;
 				boardView.level = Level.levels().get(lv);
-				
 				Uri u = SelectLevelActivity.getImgUriSetting(this);
 				if(!u.equals(oldUri))isChange = true;
-				boardView.bitmap = boardView.setImgUriSetting(u, this);
+// 以下、削除 by shima				
+//				boardView.bitmap = boardView.setImgUriSetting(u, this);
+// 以下、追加 by shima
+				boardView.bitmap = SelectLevelActivity.getBitmapSetting(this);
+// 以上。　by shima			
 				
 				boardView.board.showId = SelectLevelActivity.getHintSetting(this);
 				boardView.board.isGrid = SelectLevelActivity.getTileSetting(this);

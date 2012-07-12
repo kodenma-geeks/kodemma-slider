@@ -1,7 +1,9 @@
 package kodemma.android.sliderpuzzle;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,6 +39,8 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.setting);
+		// 非常用ビットマップの読み込み ---------------------------------------
+		getSurvivalBitmap(this);	// OutOfMemoryError発生時に、非常用ビットマップでさえも読めなくなるのを避けるため、最初に空読みしておく。
 		// level spinner ---------------------------------------
 		spnlvl = (Spinner) this.findViewById(R.id.id_conf_level_spn);
 		String[] str = new String[Level.levels().size()];
@@ -97,7 +101,12 @@ public class SelectLevelActivity extends SharedMenuActivity {
 		btnChoose = (Button) this.findViewById(R.id.id_btnChoose);
 		btnChoose.setOnClickListener(new ChooseClickListner());
 		iv = (ImageView) findViewById(R.id.imageview1);
-		iv.setImageURI(Uri.parse(getSharedPreferences("pref", MODE_PRIVATE).getString("uri", DEFAULT_IMAGE_URI)));
+// 以下、削除 by shima
+//		iv.setImageURI(Uri.parse(getSharedPreferences("pref", MODE_PRIVATE).getString("uri", DEFAULT_IMAGE_URI)));
+// 以下、追加 by shima
+		Bitmap bitmap = getBitmapSetting(this);
+		iv.setImageBitmap(bitmap);
+// 以上。　by shima
 		// button Play Activity Call
 		btnPlayActCall = (Button) this.findViewById(R.id.id_btnPlayActCall);
 		btnPlayActCall.setOnClickListener(new BtnClickListner());
@@ -124,21 +133,25 @@ public class SelectLevelActivity extends SharedMenuActivity {
 				cursor.close();
 				e.putString("uri", filename);e.commit();
 
-				InputStream is = getContentResolver().openInputStream(u);
-
-				try {
-					bmp = BitmapFactory.decodeStream(is);
-				} catch (OutOfMemoryError ome) {
-					ome.printStackTrace();
-					// メモリ不足の場合は、ダイアログを表示し、デフォルトのドロイドアイコンの画像を設定する。
-					Resources res = getResources();
-					new AlertDialog.Builder(this)
-							.setTitle(R.string.alart_title_outOfMemoey)
-							.setMessage(R.string.alart_message_outOfMEmory)
-							.setPositiveButton(R.string.str_ok, null).show();
-					bmp = BitmapFactory.decodeResource(res,R.drawable.ic_launcher);
-				}
-				iv.setImageBitmap(bmp);
+// 以下、削除 by shima
+//				InputStream is = getContentResolver().openInputStream(u);
+//				try {
+//					bmp = BitmapFactory.decodeStream(is);
+//				} catch (OutOfMemoryError ome) {
+//					ome.printStackTrace();
+//					// メモリ不足の場合は、ダイアログを表示し、デフォルトのドロイドアイコンの画像を設定する。
+//					Resources res = getResources();
+//					new AlertDialog.Builder(this)
+//							.setTitle(R.string.alart_title_outOfMemoey)
+//							.setMessage(R.string.alart_message_outOfMEmory)
+//							.setPositiveButton(R.string.str_ok, null).show();
+//					bmp = BitmapFactory.decodeResource(res,R.drawable.ic_launcher);
+//				}
+//				iv.setImageBitmap(bmp);
+// 以下、追加 by shima
+				Bitmap bitmap = getBitmapSetting(this);
+				iv.setImageBitmap(bitmap);
+// 以上。　by shima
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
@@ -181,7 +194,68 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	public static Boolean getSoundSetting(Context context) {
 		return context.getSharedPreferences("pref", MODE_PRIVATE).getBoolean("sound", false);
 	}
-	public static Uri getImgUriSetting(Context context) {
+	public static Uri getImgUriSetting(Context context) {	// このメソッドは外部からは使用しない。代わりにBitmap getBitmapSetting()を使用するべし。
 		return Uri.parse(context.getSharedPreferences("pref", MODE_PRIVATE).getString("uri", DEFAULT_IMAGE_URI));
+	}
+	// SharedPreferencesに保存されているURIからビットマップを読み込む。
+	// 読み込みに失敗した場合は、非常用ビットマップ（ドロイド君）を返す。（その際は、そのビットマップをSharedPreferencesに書き込む）
+	public static Bitmap getBitmapSetting(Context context) {
+		Uri uri = SelectLevelActivity.getImgUriSetting(context);	// SharedPreferencesに保存されているURIを取得する。
+		Bitmap bitmap = loadBitmap(context, uri);					// ビットマップを読み込む。（失敗した場合はnullが返る）
+		if (bitmap == null) {
+			SharedPreferences pref = context.getSharedPreferences("pref", MODE_PRIVATE);
+			Editor e = pref.edit();
+			// 非常用ビットマップのURI文字列を取得し、SharedPreferencesに書き込む。
+			String uriString = Utils.getResourceUri(SURVIVAL_BITMAP_RESOURCE_ID);
+			e.putString("uri", uriString);
+			e.commit();
+			// 非常用ビットマップを取得する。	
+			bitmap = getSurvivalBitmap(context);
+		}
+		return bitmap; 
+	}
+	// =================== Preventing OutOfMemory Error. ================= //
+	// 非常用ビットマップのリソースID
+	private static int SURVIVAL_BITMAP_RESOURCE_ID = R.drawable.ic_launcher;
+	// 非常用ビットマップ
+	private static Bitmap SURVIVAL_BITMAP = null;
+	// 非常用のビットマップを取得する。
+	private static Bitmap getSurvivalBitmap(Context context) {
+		if (SURVIVAL_BITMAP == null)
+			SURVIVAL_BITMAP = BitmapFactory.decodeResource(context.getResources(), SURVIVAL_BITMAP_RESOURCE_ID);
+		return SURVIVAL_BITMAP;
+	}
+	// 指定されたURIのリソースを読み込み、ビットマップを生成する。　読み込みに失敗した場合はnullを返す。
+	private static Bitmap loadBitmap(Context context, Uri uri) {
+		int messageId = 0;
+		ContentResolver contentResolver = context.getContentResolver();
+		InputStream inputStream = null;
+		try {
+			inputStream = contentResolver.openInputStream(uri);
+		} catch (FileNotFoundException fnfe) {
+			fnfe.printStackTrace();
+			messageId = R.string.alart_message_fileNotFound;
+		} catch (Exception e) {
+			e.printStackTrace();
+			messageId = R.string.alart_message_unknownException;
+		}
+		Bitmap bitmap = null;
+		if (messageId == 0) {
+			try {
+				bitmap = BitmapFactory.decodeStream(inputStream);
+			} catch (OutOfMemoryError ome) {
+				ome.printStackTrace();
+				bitmap = null;
+				messageId = R.string.alart_message_outOfMEmory;
+			}
+		}
+		if (messageId != 0) {
+			// 何らかのエラーが発生した場合は、アラート・ダイアログを表示する。
+			new AlertDialog.Builder(context)
+					.setTitle(R.string.alart_title_failureInLoadingBitmap)
+					.setMessage(messageId)
+					.setPositiveButton(R.string.str_ok, null).show();
+		}
+		return bitmap;
 	}
 }

@@ -89,8 +89,12 @@ public class BoardView extends View implements AnimationListener {
 		int lv = (SelectLevelActivity.getLevelSetting(context)==0)? 1: SelectLevelActivity.getLevelSetting(context);
 		level = Level.levels().get(lv);
 
-		Uri u = SelectLevelActivity.getImgUriSetting(context);
-		bitmap = setImgUriSetting(u, context);
+// 以下、削除 by shima
+//		Uri u = SelectLevelActivity.getImgUriSetting(context);
+//		bitmap = setImgUriSetting(u, context);
+//以下、追加 by shima
+		bitmap = SelectLevelActivity.getBitmapSetting(context);
+//以上。　by shima
 		
 		SoundEffect.setSound_mute(SelectLevelActivity.getSoundSetting(context));
 	}
