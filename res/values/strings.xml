@@ -36,4 +36,8 @@
     <string name="alart_title_outOfMemoey">Out of Memory</string>
     <string name="alart_message_outOfMEmory">メモリが不足しています。小さな画像を選択してください。</string>
 
+        <string name="rankID">Rank</string>
+     <string name="scoreID">Score</string>
+    <string name="countID">Count</string>
+    <string name="timeID">Time</string>
 </resources>
