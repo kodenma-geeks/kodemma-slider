@@ -26,7 +26,7 @@ import android.widget.Spinner;
 public class SelectLevelActivity extends SharedMenuActivity {
 
 	private static final int KDMA_SLIDE = 1;
-	private static final String DEFAULT_IMAGE_URI = Utils.getResourceUri(R.drawable.sky);
+	private static final String DEFAULT_IMAGE_URI = Utils.getResourceUri(R.drawable.ic_launcher);
 	private Spinner spnlvl; // Level setting
 	private CheckBox cbhint, cbtile, cbsound; // HINT, TILE, SOUND
 	private Button btnChoose, btnPlayActCall, btnRankingActCall,btnTitleActCall;
