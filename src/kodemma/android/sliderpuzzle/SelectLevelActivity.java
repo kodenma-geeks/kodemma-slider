@@ -28,7 +28,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	private static final int KDMA_SLIDE = 1;
 	private static final String DEFAULT_IMAGE_URI = Utils.getResourceUri(R.drawable.sky);
 	private Spinner spnlvl; // Level setting
-	private CheckBox cbhint, cbtile; // HINT, TILE
+	private CheckBox cbhint, cbtile, cbsound; // HINT, TILE, SOUND
 	private Button btnChoose, btnPlayActCall, btnRankingActCall,btnTitleActCall;
 	private ImageView iv;
 	private Bitmap bmp;
@@ -38,7 +38,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.setting);
 		// level spinner ---------------------------------------
-		spnlvl = (Spinner) this.findViewById(R.id.spinner1);
+		spnlvl = (Spinner) this.findViewById(R.id.id_conf_level_spn);
 		String[] str = new String[Level.levels().size()];
 		int i=0;
 		for (Level v : Level.levels().values()) { str[i]=v.text(); i++;}
@@ -60,7 +60,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 			public void onNothingSelected(AdapterView<?> v) {}
 		});
 		// hint ------------------------------------------------
-		cbhint = (CheckBox) this.findViewById(R.id.checkBox1);
+		cbhint = (CheckBox) this.findViewById(R.id.id_conf_cbhint);
 		cbhint.setChecked(getSharedPreferences("pref", MODE_PRIVATE).getBoolean("hint", false));
 		cbhint.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton cdhint, boolean isChecked) {
@@ -71,7 +71,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 			}
 		});
 		// tile ------------------------------------------------
-		cbtile = (CheckBox) this.findViewById(R.id.checkBox2);
+		cbtile = (CheckBox) this.findViewById(R.id.id_conf_cbtile);
 		cbtile.setChecked(getSharedPreferences("pref", MODE_PRIVATE).getBoolean("tile", false));
 		cbtile.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton cbtile, boolean isChecked) {
@@ -81,21 +81,32 @@ public class SelectLevelActivity extends SharedMenuActivity {
 				 else if (cbtile.isChecked() == false) { e.putBoolean("tile",false); e.commit(); }
 			}
 		});
+		// tile ------------------------------------------------
+		cbsound = (CheckBox) this.findViewById(R.id.id_conf_cbsound);
+		cbsound.setChecked(getSharedPreferences("pref", MODE_PRIVATE).getBoolean("sound", false));
+		cbsound.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			public void onCheckedChanged(CompoundButton cbsound, boolean isChecked) {
+				SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+				Editor e = pref.edit();
+				 if (cbsound.isChecked() == true) { e.putBoolean("sound", true);e.commit(); }
+				 else if (cbsound.isChecked() == false) { e.putBoolean("sound",false); e.commit(); }
+			}
+		});
 		// =================== current screen transitions to Call screen.
-		// button Play Activity Call
-		btnPlayActCall = (Button) this.findViewById(R.id.button2);
-		btnPlayActCall.setOnClickListener(new BtnClickListner());
-		// button Ranking Activity Call
-		btnRankingActCall = (Button) this.findViewById(R.id.button3);
-		btnRankingActCall.setOnClickListener(new BtnClickListner());
-		// button Exit(Title) Activity Call
-		btnTitleActCall = (Button) this.findViewById(R.id.button4);
-		btnTitleActCall.setOnClickListener(new BtnClickListner());
 		// button picture Choose
-		btnChoose = (Button) this.findViewById(R.id.button1);
+		btnChoose = (Button) this.findViewById(R.id.id_btnChoose);
 		btnChoose.setOnClickListener(new ChooseClickListner());
 		iv = (ImageView) findViewById(R.id.imageview1);
 		iv.setImageURI(Uri.parse(getSharedPreferences("pref", MODE_PRIVATE).getString("uri", DEFAULT_IMAGE_URI)));
+		// button Play Activity Call
+		btnPlayActCall = (Button) this.findViewById(R.id.id_btnPlayActCall);
+		btnPlayActCall.setOnClickListener(new BtnClickListner());
+		// button Ranking Activity Call
+		btnRankingActCall = (Button) this.findViewById(R.id.id_btnRankingActCall);
+		btnRankingActCall.setOnClickListener(new BtnClickListner());
+		// button Exit(Title) Activity Call
+		btnTitleActCall = (Button) this.findViewById(R.id.id_btnTitleActCall);
+		btnTitleActCall.setOnClickListener(new BtnClickListner());
 	}
 
 	// =================== gallery result ================= //
@@ -138,10 +149,13 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	class BtnClickListner implements OnClickListener {
 		public void onClick(View v) {
 			Intent it = null;
-			if( v == btnPlayActCall ){ it = new Intent(SelectLevelActivity.this, BoardActivity.class);}
-//			else if( v == btnRankingActCall ){ it = new Intent(SelectLevelActivity.this, RankingActivity.class);}
-			else if( v == btnTitleActCall ){ it = new Intent(SelectLevelActivity.this, TitleActivity.class);}
-			startActivity(it);
+			if( v == btnPlayActCall ){	// 浜田修正　7/11　プレイ途中のタイルを保持するためにIntentで戻ります。
+				it = getIntent();
+				setResult(RESULT_OK, it);
+				finish();
+			}
+			else if( v == btnRankingActCall ){ it = new Intent(SelectLevelActivity.this, RankingActivity.class);startActivity(it);}
+			else if( v == btnTitleActCall ){ it = new Intent(SelectLevelActivity.this, TitleActivity.class);startActivity(it);}
 		}
 	}
 
@@ -163,6 +177,9 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	}
 	public static Boolean getTileSetting(Context context) {
 		return context.getSharedPreferences("pref", MODE_PRIVATE).getBoolean("tile", false);
+	}
+	public static Boolean getSoundSetting(Context context) {
+		return context.getSharedPreferences("pref", MODE_PRIVATE).getBoolean("sound", false);
 	}
 	public static Uri getImgUriSetting(Context context) {
 		return Uri.parse(context.getSharedPreferences("pref", MODE_PRIVATE).getString("uri", DEFAULT_IMAGE_URI));
