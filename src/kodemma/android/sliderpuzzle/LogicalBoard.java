@@ -87,8 +87,6 @@ public class LogicalBoard {
 			// 絞られた候補の中から、どのタイルを動かすかランダムで決定
 			newMove = tile.get((int) (Math.random() * tile.size()));
 
-//			oldMove = newMove.serial;
-
 				// デバッグ用
 //				debug(i,tile);
 			
@@ -111,22 +109,18 @@ public class LogicalBoard {
 
 		ArrayList<LogicalTile> canMoveTiles = new ArrayList<LogicalTile>();
 
-//		if (0 <= hole.lp.y && hole.lp.y < row) {	// 上下にはみ出さない中から
-			if (hole.lp.x - 1 >= 0) {	// 左見て
-				canMoveTiles.add(tiles[hole.lp.x - 1][hole.lp.y]);
-			}
-			if (hole.lp.x + 1 < column) {	// 右見て
-				canMoveTiles.add(tiles[hole.lp.x + 1][hole.lp.y]);
-			}
-//		}
-//		if (0 <= hole.lp.x && hole.lp.x < column) {	// 左右にはみ出さない中から
-			if (hole.lp.y - 1 >= 0) {	// 上見て
-				canMoveTiles.add(tiles[hole.lp.x][hole.lp.y - 1]);
-			}
-			if (hole.lp.y + 1 < row) {	// 下見て
-				canMoveTiles.add(tiles[hole.lp.x][hole.lp.y + 1]);
-			}
-//		}
+		if (hole.lp.x - 1 >= 0) {	// 左見て
+			canMoveTiles.add(tiles[hole.lp.x - 1][hole.lp.y]);
+		}
+		if (hole.lp.x + 1 < column) {	// 右見て
+			canMoveTiles.add(tiles[hole.lp.x + 1][hole.lp.y]);
+		}
+		if (hole.lp.y - 1 >= 0) {	// 上見て
+			canMoveTiles.add(tiles[hole.lp.x][hole.lp.y - 1]);
+		}
+		if (hole.lp.y + 1 < row) {	// 下見て
+			canMoveTiles.add(tiles[hole.lp.x][hole.lp.y + 1]);
+		}
 		return canMoveTiles;
 	}
 
@@ -187,7 +181,7 @@ public class LogicalBoard {
 		if ((hole.lp.x == logTil.lp.x && (Math.abs(hole.lp.y - logTil.lp.y) == 1))	 // 横または
 		  ||(hole.lp.y == logTil.lp.y && (Math.abs(hole.lp.x - logTil.lp.x) == 1))){ // 縦に隣接しているか？
 			
-			totalDistance -= getDistance(logTil);	// 前回距離
+			totalDistance -= getDistance(logTil);	// 現状の離散度を減算
 
 			// オブジェクトの入れ替え
 			oldMove = tiles[logTil.lp.x][logTil.lp.y];
@@ -203,7 +197,7 @@ public class LogicalBoard {
 			// 棋譜への追加
 			recode.add(hole.lp); // added by shima
 
-			totalDistance += getDistance(logTil);	// 今回距離
+			totalDistance += getDistance(logTil);	// 新しい離散度を加算
 
 			return true;
 		}

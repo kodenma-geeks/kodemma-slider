@@ -12,7 +12,13 @@ public class SoundEffect {
 	static int sound_Button_on;
 	static int sound_Button_off;
 	static int sound_solved;
-//サウンドプールをロード
+	
+	static boolean isSound_mute;
+	
+	public static void setSound_mute(boolean sound) {
+		SoundEffect.isSound_mute = sound;
+	}
+	//サウンドプールをロード
 	public static void soundLoad(Context cn){
 		mSoundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 //		sound_Touch = mSoundPool.load(cn, R.raw.switch_ti, 1);
@@ -33,6 +39,7 @@ public class SoundEffect {
 	}
 //効果音の再生タイミングで呼び出すメソッド
 	public static void getSound(int sound_source){
+		if(isSound_mute)return;
 		mSoundPool.play(sound_source, 0.3f, 0.3f, 1, 0, 1.0f);
 	}
 }
