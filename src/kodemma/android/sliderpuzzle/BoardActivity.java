@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class BoardActivity extends SharedMenuActivity implements BoardViewListener {
 	private static final int INTENT_FOR_SELECT_LEVEL = 1;
+	private static final int INTENT_FOR_RANKING = 3;
 	private BoardView boardView;
 	private BackgroundView backgroundView;
 	private TextView slideCounterView;
@@ -21,10 +23,11 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	private PuzzleTimerTask chronometer;
 	private Map<Integer, Button> buttonMap;
 	
-//	private Board board;	// 浜田　追記7/5
-//	private BoardViewListener boardViewListener;	// 浜田　追記7/5
-	GameStatus stat;	// 浜田　追記7/5
 
+	GameStatus stat;	// 浜田　追記7/5
+	int oldLevel;	// 浜田　追記7/12
+	Uri oldUri;	// 浜田　追記7/12
+	boolean isChange;	// 浜田　追記7/12
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.board);
@@ -47,24 +50,50 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onRestart(){
 		super.onRestart();
-		chronometer.timerResume();
-		stat = GameStatus.WAITING;
+		if(!isChange){
+			chronometer.timerResume();
+		}
 	}
 	public void onActivityResult(int reqcode, int result, Intent it) {
 		switch(reqcode) {
 		case INTENT_FOR_SELECT_LEVEL:
 			if (result == RESULT_OK) {
+				
+//				int lv = (SelectLevelActivity.getLevelSetting(this)==0)? 1: SelectLevelActivity.getLevelSetting(this);
+//				boardView.level = Level.levels().get(lv);
+//				
+//				Uri u = SelectLevelActivity.getImgUriSetting(this);
+//				boardView.bitmap = boardView.setImgUriSetting(u, this);
+//				
+//				boardView.board.showId = SelectLevelActivity.getHintSetting(this);
+//				boardView.board.isGrid = SelectLevelActivity.getTileSetting(this);
+//				
+//				boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
+
+				//設定画面からの戻り修正　浜田　7/12				
+				isChange = false;
+				
 				int lv = (SelectLevelActivity.getLevelSetting(this)==0)? 1: SelectLevelActivity.getLevelSetting(this);
-//				int lv = SelectLevelActivity.getLevelSetting(context);
+				if(lv != oldLevel)isChange = true;
 				boardView.level = Level.levels().get(lv);
 				
 				Uri u = SelectLevelActivity.getImgUriSetting(this);
+				if(!u.equals(oldUri))isChange = true;
 				boardView.bitmap = boardView.setImgUriSetting(u, this);
 				
-				boardView.showId = SelectLevelActivity.getHintSetting(this);
-				boardView.isGrid = SelectLevelActivity.getTileSetting(this);
-				
-				boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
+				boardView.board.showId = SelectLevelActivity.getHintSetting(this);
+				boardView.board.isGrid = SelectLevelActivity.getTileSetting(this);
+				boardView.board.border = boardView.board.getGrid(SelectLevelActivity.getTileSetting(this));
+//				boardView.invalidate();
+
+				if(isChange){//レベルか画像が変更された場合の処理
+					chronometer.timerStop();
+					buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
+					boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
+					boardView.gameStatus = GameStatus.WAITING;
+				}else{
+					chronometer.timerResume();					
+				}
 			}
 			break;
 		}
@@ -82,6 +111,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onGameSolved(int rows, int cols, int slides) {
 		// ここでランキング画面へ遷移する
+		Toast.makeText(this,"Congratulation!",Toast.LENGTH_LONG).show();	// クリア時に表示
 //		Intent it_for_ranking = new Intent(BoardActivity.this, RankingActivity.class);
 //		it_for_ranking.putExtra("Laptime", PuzzleTimerTask.lapTime);
 //		it_for_ranking.putExtra("Slidecount", slides);
@@ -129,10 +159,12 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 			case R.id.board_button_setting:
 				SoundEffect.getSound(SoundEffect.sound_Button_on);
 				Intent it_for_setting = new Intent(BoardActivity.this, SelectLevelActivity.class);
-				it_for_setting.putExtra("STATUS", stat);
-//				it_for_setting.putExtra("HINT", boardView.board.showId);
-//				it_for_setting.putExtra("PICTURE", boardView.board.bitmap);
+
+				oldLevel = boardView.level.level();	// 変更前の値を保存
+				oldUri = SelectLevelActivity.getImgUriSetting(BoardActivity.this);	// 変更前の値を保存
+
 				startActivityForResult(it_for_setting, INTENT_FOR_SELECT_LEVEL);
+
 				break;
 			case R.id.board_button_title:
 				SoundEffect.getSound(SoundEffect.sound_Button_on);

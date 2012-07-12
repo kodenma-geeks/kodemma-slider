@@ -55,9 +55,11 @@ public class Board {
 	boolean isGrid;								// タイルの枠の表示/非表示
 	int border;		// 浜田						// タイルの枠線の幅
 	
-	Board(Bitmap b, int r, int c, int w, int h,	boolean si, boolean gr) {
+//	Board(Bitmap b, int r, int c, int w, int h,	boolean si, boolean gr) {
+	Board(Bitmap b, Level lv, int w, int h,	boolean si,	boolean gr) {// 浜田　7/11　スリム化
 		bitmap = b;
-		rows = r; cols = c;
+		Point p = Utils.getColRow(b, lv);
+		rows = p.y; cols = p.x;
 		width = w; height = h;
 //		logicalBoard = new LogicalBoard(rows=r, cols=c);
 		textPaint	= new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -70,9 +72,13 @@ public class Board {
 		
 		showId = si;		// 浜田
 		isGrid = gr;
-		border = isGrid? BORDER_WIDTH : 0;	// 浜田
+//		border = isGrid? BORDER_WIDTH : 0;	// 浜田
+		border = getGrid(isGrid);	// 浜田　メソッド化
 	}
-
+	// 枠の太さを取得する
+	int getGrid(boolean isGrid) {
+		return (isGrid)? BORDER_WIDTH : 0;
+	}
 	// タイルの生成と初期化を行う
 	void initializeTiles() {
 		// タイルのsrc矩形からdst矩形への変換をするためのマトリックスを作成する
@@ -186,6 +192,19 @@ public class Board {
 			if (movablesSet.contains(t)) continue; // 部分再描画：不具合対応①-start
 			drawTile(canvas, t, buffer);
 		}
+	}
+	// ゲームクリア時のゲーム盤全体を描画
+	void draw(Canvas canvas, Set<Tile> movablesSet) {	// 浜田　メソッド新設
+		Rect buffer = new Rect();
+		boolean tmpID = showId;
+		int tmpBorder = border;
+		showId = false;
+		border = 0;
+		for (Tile t : tiles) {
+			drawTile(canvas, t, buffer);
+		}
+		showId = tmpID;
+		border = tmpBorder;
 	}
 	// 移動ベクトルを加算したタイルを描画する
 	void drawTile(Canvas canvas, Tile tile, Point vector) {

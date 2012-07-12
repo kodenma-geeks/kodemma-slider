@@ -37,9 +37,9 @@ import android.view.View;
 import android.widget.ImageView;
 
 enum GameStatus {
-	WAITING, PLAYING, PAUSED, UNDOING, SOLVED;
+	WAITING, PLAYING, PAUSED, UNDOING, SOLVED, SP_ENDED;
 	boolean shielded() { return this == WAITING || this == PAUSED; }
-	boolean animating() { return this == UNDOING || this == SOLVED; }
+	boolean animating() { return this == UNDOING || this == SOLVED || this == SP_ENDED; }
 	boolean inputIgnored() { return this.shielded() || this.animating();}
 }
 interface BoardViewListener extends EventListener {
@@ -62,16 +62,13 @@ public class BoardView extends View implements AnimationListener {
 	private Rect invalidated;				// 再描画する矩形領域
 	Board board;					// ゲーム盤クラス
 	Bitmap bitmap; // 浜田　7/5
-	boolean showId;						// タイル番号の表示/非表示
-	boolean isGrid;						// タイル枠の表示/非表示
-//	int rows; // 浜田　7/5
-//	int cols; // 浜田　7/5
-//	int small; // 浜田　7/5
-//	int large; // 浜田　7/5
+//	boolean showId;						// タイル番号の表示/非表示	// 浜田　7/12 Boardのほうで宣言
+//	boolean isGrid;						// タイル枠の表示/非表示	// 浜田　7/12 Boardのほうで宣言
+	boolean isSound_mute; // 浜田　7/12
 	Level level; // 浜田　7/5
 	private List<Tile> movables = new ArrayList<Tile>();	// スライドするタイル群
 	private Set<Tile> movablesSet = new HashSet<Tile>(); 
-	private GameStatus gameStatus = GameStatus.WAITING;
+	GameStatus gameStatus = GameStatus.WAITING;
 	BoardViewListener boardViewListener;
 	private AnimationListener splashListener = this;
 	private Matrix splashMatrix;
@@ -90,20 +87,18 @@ public class BoardView extends View implements AnimationListener {
 		shieldPaint.setAlpha(128);
 
 		int lv = (SelectLevelActivity.getLevelSetting(context)==0)? 1: SelectLevelActivity.getLevelSetting(context);
-//		int lv = SelectLevelActivity.getLevelSetting(context);
 		level = Level.levels().get(lv);
 
 		Uri u = SelectLevelActivity.getImgUriSetting(context);
 		bitmap = setImgUriSetting(u, context);
-		showId = SelectLevelActivity.getHintSetting(context);
-		isGrid = SelectLevelActivity.getTileSetting(context);
+		
+		SoundEffect.setSound_mute(SelectLevelActivity.getSoundSetting(context));
 	}
-	// Uriからの画像メソッド
+	// Uriから画像をセットするメソッド
 	protected Bitmap setImgUriSetting(Uri u, Context cn) {
 		InputStream inputStream = null;
 		try {
-			ContentResolver contentResolver = cn.getContentResolver();
-			inputStream = contentResolver.openInputStream(u);
+			inputStream = cn.getContentResolver().openInputStream(u);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -113,8 +108,10 @@ public class BoardView extends View implements AnimationListener {
 		super.onSizeChanged(w, h, pw, ph);
 		shield = new Rect(0, 0, w, h);
 		
-// 		bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.sky);
-		board = new Board(bitmap, Utils.getColRow(bitmap, level).y,  Utils.getColRow(bitmap, level).x, w, h, showId,isGrid);
+//		board = new Board(bitmap, Utils.getColRow(bitmap, level).y,  Utils.getColRow(bitmap, level).x, w, h, showId,isGrid);
+		boolean showId = SelectLevelActivity.getHintSetting(getContext());
+		boolean isGrid = SelectLevelActivity.getTileSetting(getContext());
+		board = new Board(bitmap, level, w, h, showId, isGrid);// 浜田　7/11　スリム化
 //		board = new Board(bitmap, rows, cols, w, h);
 		board.initializeTiles();
 // 		board.shuffle();
@@ -173,7 +170,9 @@ public class BoardView extends View implements AnimationListener {
 	}
 	@Override protected void onDraw(Canvas canvas) {
 //		Log.d(TAG, "gameStatus=" + gameStatus + ", DRAW_ALL=" + DRAW_ALL);
-		if (gameStatus == GameStatus.SOLVED) {
+		if (gameStatus == GameStatus.SP_ENDED) {	// 浜田　7/12 追加
+			board.draw(canvas, movablesSet);	
+		} else if (gameStatus == GameStatus.SOLVED) {
 			board.draw(canvas, gameStatus, movablesSet);
 		} else {
 			board.draw(canvas, gameStatus, movablesSet);
@@ -209,8 +208,9 @@ public class BoardView extends View implements AnimationListener {
 		SoundEffect.getSound(SoundEffect.sound_solved);
 	}
 	public void onUndoEnded() {
-		gameStatus = GameStatus.PLAYING;
-		gameStatus = GameStatus.WAITING;
+//		gameStatus = GameStatus.PLAYING;
+//		gameStatus = GameStatus.WAITING;
+		gameStatus = GameStatus.SP_ENDED;
 		invalidate();
 		boardViewListener.onGameSolved(board.rows, board.cols, board.slideCount);
 	}
@@ -234,6 +234,9 @@ public class BoardView extends View implements AnimationListener {
 		movablesSet.clear();
 		vec = null;
 		switch (gameStatus) {
+		case PAUSED:	// PAUSED追加
+			break;
+		case SP_ENDED:	// SP_ENDED追加
 		case WAITING:
 			board.shuffle();
 			boardViewListener.onTileSlided(board.slideCount);
