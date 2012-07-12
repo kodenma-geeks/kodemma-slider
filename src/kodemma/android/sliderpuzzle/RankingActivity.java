@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -42,7 +43,6 @@ public class RankingActivity extends Activity {
 		if (extras != null) {
 			timeKey = extras.getInt("Laptime");
 			countKey = extras.getInt("Slidecount");
-			panelKey = extras.getInt("panels");
 		}
 		Toast.makeText(this, "test---->    " + timeKey, Toast.LENGTH_LONG)
 				.show();
@@ -159,7 +159,7 @@ public class RankingActivity extends Activity {
 
 					TextView ranktxt = new TextView(RankingActivity.this);
 					ranktxt.setGravity(Gravity.CENTER_HORIZONTAL);
-					ranktxt.setText(cursor.getString(0) + "位");
+					ranktxt.setText(cursor.getString(0) + R.string.ranking_place);
 
 					TextView scoretxt = new TextView(RankingActivity.this);
 					scoretxt.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -232,7 +232,7 @@ public class RankingActivity extends Activity {
 
 			TextView ranktxt = new TextView(RankingActivity.this);
 			ranktxt.setGravity(Gravity.CENTER_HORIZONTAL);
-			ranktxt.setText(cursor.getString(0) + "位");
+			ranktxt.setText(cursor.getString(0) + R.string.ranking_place);
 
 			TextView scoretxt = new TextView(RankingActivity.this);
 			scoretxt.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -261,10 +261,10 @@ public class RankingActivity extends Activity {
 	public void titleBack() {
 
 		Intent intent = new Intent();
-		intent.setClassName(getPackageName(), getPackageName()
-				+ ".TitleActivity");
+		intent.setClassName(getPackageName(), getPackageName() + ".TitleActivity");
 
 		startActivity(intent);
+		finish();
 	}
 
 	public void Insert(int time, int count, int panel) {
@@ -279,5 +279,19 @@ public class RankingActivity extends Activity {
 		db.insert("ranking_table", null, val);
 
 	}
+	//7.12ハードキーのバックキーを押された場合
+	 public boolean onKeyDown(int keyCode, KeyEvent event)
+	 {
+		 //戻りボタンの処理
+       if (keyCode == KeyEvent.KEYCODE_BACK)
+       {
+    	   Toast.makeText(this, "Please press title button", Toast.LENGTH_SHORT).show();
+      	 	return false;
+       }
+       else
+       {
+           return super.onKeyDown(keyCode, event);
+       }
+	 }
 
 }

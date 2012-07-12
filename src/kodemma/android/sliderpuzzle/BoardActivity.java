@@ -8,6 +8,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -50,6 +51,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onRestart(){
 		super.onRestart();
+		SoundEffect.soundLoad(this);
 		if(!isChange){
 			chronometer.timerResume();
 		}
@@ -112,11 +114,11 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	public void onGameSolved(int rows, int cols, int slides) {
 		// ここでランキング画面へ遷移する
 		Toast.makeText(this,"Congratulation!",Toast.LENGTH_LONG).show();	// クリア時に表示
-//		Intent it_for_ranking = new Intent(BoardActivity.this, RankingActivity.class);
-//		it_for_ranking.putExtra("Laptime", PuzzleTimerTask.lapTime);
-//		it_for_ranking.putExtra("Slidecount", slides);
-//		it_for_ranking.putExtra("panels", rows*cols);
-//		startActivity(it_for_ranking);
+		Intent it_for_ranking = new Intent(BoardActivity.this, RankingActivity.class);
+		it_for_ranking.putExtra("Laptime", PuzzleTimerTask.lapTime);
+		it_for_ranking.putExtra("Slidecount", slides);
+		startActivity(it_for_ranking);
+		finish();
 	}
 	private class ButtonClickListener implements View.OnClickListener {
 		private ButtonClickListener() {
@@ -176,4 +178,17 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 			}
 		}
 	}
+	 public boolean onKeyDown(int keyCode, KeyEvent event)
+	 {
+		 //戻りボタンの処理
+        if (keyCode == KeyEvent.KEYCODE_BACK)
+        {
+        	Toast.makeText(this, "Can not back", Toast.LENGTH_SHORT).show();
+       	 	return false;
+        }
+        else
+        {
+            return super.onKeyDown(keyCode, event);
+        }
+	 }
 }
