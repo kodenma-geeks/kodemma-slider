@@ -108,7 +108,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onGameSolved(int rows, int cols, int slides) {
 		// ここでランキング画面へ遷移する
-		Toast.makeText(this,(R.string.congratulation),Toast.LENGTH_LONG).show();	// クリア時に表示
+//		Toast.makeText(this,(R.string.congratulation),Toast.LENGTH_LONG).show();	// クリア時に表示
 		try {
 		    Thread.sleep(2000); //2000ミリ秒Sleepする
 		} catch (InterruptedException e) {}
@@ -116,8 +116,6 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		Intent it_for_ranking = new Intent(BoardActivity.this, RankingActivity.class);
 		it_for_ranking.putExtra("Laptime", PuzzleTimerTask.lapTime);
 		it_for_ranking.putExtra("Slidecount", slides);
-		Log.i("Laptime", Float.toString(PuzzleTimerTask.lapTime));
-		System.out.println("Slidecount "+ slides);
 		startActivity(it_for_ranking);
 		finish();
 	}
