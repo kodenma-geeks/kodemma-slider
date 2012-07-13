@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ***** 文字列 ***** -->
+
+    <string name="app_name">Kodemma Slider</string>
+
+    <!-- *** BoardActivity *** -->
+    <string name="board_button_start">start</string>
+    <string name="board_button_restart">restart</string>
+    <string name="board_button_pause">pause</string>
+    <string name="board_button_resume">resume</string>
+    <string name="board_button_setting">setting</string>
+    <string name="board_button_title">title</string>
+    <string name="congratulation">congratulation!</string>
+    
+    <!-- *** config resource *** -->
+    <string name="menu_exit">exit</string>
+    <string name="config_title">Game Setting</string>
+    <string name="conf_level">Level Setting </string>
+    <string name="conf_hint">HINT On/Off</string>
+    <string name="conf_tile">TILE On/Off</string>
+    <string name="conf_pict">Select BackGround Picture</string>
+    <string name="str_confirm">Confirm</string>
+    <string name="str_ok">Ok</string>
+    <string name="str_cancel">Cancel</string>
+    <string name="txt_label_level">Level Setting</string>
+    <string name="txt_label_hint">HINT</string>
+    <string name="txt_label_tile">TILE</string>
+    <string name="txt_label_choose">Choose</string>
+    <string name="txt_label_sound">SOUND</string>
+    <string name="txt_btn_play">play</string>
+    <string name="txt_btn_ranking">ranking</string>
+    <string name="txt_btn_exit">exit</string>
+
+    <!-- *** dialog message *** -->
+    <string name="alart_title_failureInLoadingBitmap">Failure in Loading Bitmap</string>
+    <string name="alart_message_outOfMEmory">メモリが不足しています。小さな画像を選択してください。</string>
+    <string name="alart_message_fileNotFound">画像ファイルが見つかりません。別の画像を選択してください。</string>
+    <string name="alart_message_unknownException">予期せぬ例外が発生しました。別の画像を選択してください。</string>
+
+    <!-- *** RankingActivity *** -->
+    <string name="rankID">Rank</string>
+    <string name="scoreID">Score</string>
+    <string name="countID">Count</string>
+    <string name="timeID">Time</string>
+    <string name="ranking_place">st</string>
+</resources>
