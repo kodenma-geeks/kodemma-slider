@@ -87,7 +87,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 		});
 		// tile ------------------------------------------------
 		cbsound = (CheckBox) this.findViewById(R.id.id_conf_cbsound);
-		cbsound.setChecked(getSharedPreferences("pref", MODE_PRIVATE).getBoolean("sound", false));
+		cbsound.setChecked(getSharedPreferences("pref", MODE_PRIVATE).getBoolean("sound", true));
 		cbsound.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton cbsound, boolean isChecked) {
 				SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
@@ -162,10 +162,18 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	class BtnClickListner implements OnClickListener {
 		public void onClick(View v) {
 			Intent it = null;
-			if( v == btnPlayActCall ){	// 浜田修正　7/11　プレイ途中のタイルを保持するためにIntentで戻ります。
+			if( v == btnPlayActCall ){	// 浜田修正　7/12　プレイ途中のタイルを保持するためにIntentで戻ります。
+				// button Play Activity Call"level", res 
 				it = getIntent();
-				setResult(RESULT_OK, it);
-				finish();
+				boolean isGame = it.getBooleanExtra("GAME", false);
+				
+				if(isGame){
+					setResult(RESULT_OK, it);
+					finish();
+				}else{
+					it = new Intent(SelectLevelActivity.this, BoardActivity.class);
+					startActivity(it);
+				}
 			}
 			else if( v == btnRankingActCall ){ it = new Intent(SelectLevelActivity.this, RankingActivity.class);startActivity(it);}
 			else if( v == btnTitleActCall ){ it = new Intent(SelectLevelActivity.this, TitleActivity.class);startActivity(it);}
@@ -192,7 +200,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 		return context.getSharedPreferences("pref", MODE_PRIVATE).getBoolean("tile", false);
 	}
 	public static Boolean getSoundSetting(Context context) {
-		return context.getSharedPreferences("pref", MODE_PRIVATE).getBoolean("sound", false);
+		return context.getSharedPreferences("pref", MODE_PRIVATE).getBoolean("sound", true);
 	}
 	public static Uri getImgUriSetting(Context context) {	// このメソッドは外部からは使用しない。代わりにBitmap getBitmapSetting()を使用するべし。
 		return Uri.parse(context.getSharedPreferences("pref", MODE_PRIVATE).getString("uri", DEFAULT_IMAGE_URI));

@@ -4,6 +4,15 @@
     android:layout_height="fill_parent" >
 
     <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/imageView2"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/title" />
+
+    <ImageView
         android:id="@+id/imageView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -35,7 +44,7 @@
         android:layout_centerHorizontal="true"
         android:src="@drawable/exits" />
 
-    <LinearLayout
+<!--     <LinearLayout
         android:id="@+id/LinearLayout1"
         android:gravity="center_vertical|fill_horizontal"
         android:layout_width="wrap_content"
@@ -45,5 +54,6 @@
         android:layout_above="@+id/imageView2"
         android:orientation="horizontal" >
     </LinearLayout>
+ -->
 
-</RelativeLayout>
+ </RelativeLayout>

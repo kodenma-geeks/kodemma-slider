@@ -14,8 +14,7 @@
         android:id="@+id/textView_level"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="3×3LEVEL" />
+        android:gravity="center" />
 
     <ScrollView
         android:layout_width="fill_parent"

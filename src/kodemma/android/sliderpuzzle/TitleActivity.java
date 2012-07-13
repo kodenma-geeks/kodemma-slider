@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class TitleActivity extends SharedMenuActivity {
-	GifView gifView;
+//	GifView gifView;
 
 	
 	public void onCreate(Bundle savedInstanceState) {
@@ -16,10 +16,10 @@ public class TitleActivity extends SharedMenuActivity {
 		setContentView(R.layout.title);
 		setMoveActivity();
 		
-		LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayout1);
-		gifView = new GifView(this);
-		gifView.setGif(R.drawable.logo);
-		ll.addView(gifView);
+//		LinearLayout ll = (LinearLayout) findViewById(R.id.LinearLayout1);
+//		gifView = new GifView(this);
+//		gifView.setGif(R.drawable.logo);
+//		ll.addView(gifView);
 	}
 
 	private void setMoveActivity() {
