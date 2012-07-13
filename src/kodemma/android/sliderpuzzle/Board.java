@@ -196,15 +196,15 @@ public class Board {
 	// ゲームクリア時のゲーム盤全体を描画
 	void draw(Canvas canvas, Set<Tile> movablesSet) {	// 浜田　メソッド新設
 		Rect buffer = new Rect();
-		boolean tmpID = showId;
-		int tmpBorder = border;
+		boolean tmpID = showId;	// 値を退避
+		int tmpBorder = border;	// 値を退避
 		showId = false;
 		border = 0;
 		for (Tile t : tiles) {
 			drawTile(canvas, t, buffer);
 		}
-		showId = tmpID;
-		border = tmpBorder;
+		showId = tmpID;		// 値を戻す
+		border = tmpBorder;	// 値を戻す
 	}
 	// 移動ベクトルを加算したタイルを描画する
 	void drawTile(Canvas canvas, Tile tile, Point vector) {

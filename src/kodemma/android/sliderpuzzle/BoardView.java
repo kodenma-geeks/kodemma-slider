@@ -35,6 +35,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 enum GameStatus {
 	WAITING, PLAYING, PAUSED, UNDOING, SOLVED, SP_ENDED;
@@ -64,7 +65,7 @@ public class BoardView extends View implements AnimationListener {
 	Bitmap bitmap; // 浜田　7/5
 //	boolean showId;						// タイル番号の表示/非表示	// 浜田　7/12 Boardのほうで宣言
 //	boolean isGrid;						// タイル枠の表示/非表示	// 浜田　7/12 Boardのほうで宣言
-	boolean isSound_mute; // 浜田　7/12
+//	boolean isSound_mute; // 浜田　7/12
 	Level level; // 浜田　7/5
 	private List<Tile> movables = new ArrayList<Tile>();	// スライドするタイル群
 	private Set<Tile> movablesSet = new HashSet<Tile>(); 
@@ -98,16 +99,16 @@ public class BoardView extends View implements AnimationListener {
 		
 		SoundEffect.setSound_mute(SelectLevelActivity.getSoundSetting(context));
 	}
-	// Uriから画像をセットするメソッド
-	protected Bitmap setImgUriSetting(Uri u, Context cn) {
-		InputStream inputStream = null;
-		try {
-			inputStream = cn.getContentResolver().openInputStream(u);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		return BitmapFactory.decodeStream(inputStream);
-	}
+//	// Uriから画像をセットするメソッド
+//	protected Bitmap setImgUriSetting(Uri u, Context cn) {
+//		InputStream inputStream = null;
+//		try {
+//			inputStream = cn.getContentResolver().openInputStream(u);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		return BitmapFactory.decodeStream(inputStream);
+//	}
 	@Override protected void onSizeChanged(int w, int h, int pw, int ph) {
 		super.onSizeChanged(w, h, pw, ph);
 		shield = new Rect(0, 0, w, h);
@@ -116,7 +117,6 @@ public class BoardView extends View implements AnimationListener {
 		boolean showId = SelectLevelActivity.getHintSetting(getContext());
 		boolean isGrid = SelectLevelActivity.getTileSetting(getContext());
 		board = new Board(bitmap, level, w, h, showId, isGrid);// 浜田　7/11　スリム化
-//		board = new Board(bitmap, rows, cols, w, h);
 		board.initializeTiles();
 // 		board.shuffle();
 		
@@ -175,10 +175,11 @@ public class BoardView extends View implements AnimationListener {
 	}
 	@Override protected void onDraw(Canvas canvas) {
 //		Log.d(TAG, "gameStatus=" + gameStatus + ", DRAW_ALL=" + DRAW_ALL);
-		if (gameStatus == GameStatus.SP_ENDED) {	// 浜田　7/12 追加
-			board.draw(canvas, movablesSet);
-		} else if (gameStatus == GameStatus.SOLVED) {
-			board.draw(canvas, gameStatus, movablesSet);
+//		if (gameStatus == GameStatus.SP_ENDED) {	// 浜田　7/12 追加
+//			board.draw(canvas, movablesSet);
+//		} else if (gameStatus == GameStatus.SOLVED) {
+		if (gameStatus == GameStatus.SOLVED) {
+			board.draw(canvas, movablesSet);	// 浜田　7/13 引数をひとつ除去
 		} else {
 			board.draw(canvas, gameStatus, movablesSet);
 			if (DRAW_ALL) {
@@ -206,6 +207,7 @@ public class BoardView extends View implements AnimationListener {
 		}
 	}
 	public void onUndoStarted() {
+		Toast.makeText(getContext(),(R.string.congratulation),Toast.LENGTH_SHORT).show();	// クリア時に表示
 		gameStatus = GameStatus.UNDOING;
 		splushFrameCounter = 0;
 		// アンドゥ時のアニメーションを執り行うハンドラを起動
@@ -216,7 +218,7 @@ public class BoardView extends View implements AnimationListener {
 //		gameStatus = GameStatus.PLAYING;
 //		gameStatus = GameStatus.WAITING;
 		gameStatus = GameStatus.SP_ENDED;
-		invalidate();
+//		invalidate();
 		boardViewListener.onGameSolved(board.rows, board.cols, board.slideCount);
 	}
 	public void onSplashStarted() {
@@ -264,11 +266,13 @@ public class BoardView extends View implements AnimationListener {
 		case WAITING:
 			break;
 		case PLAYING:
-			gameStatus = GameStatus.PAUSED;
+			board.showId = false;
+			gameStatus = GameStatus.PAUSED;	// PAUSED時はヒントを出さない
 			DRAW_ALL = true;
 			invalidate();
 			break;
 		case PAUSED:
+			board.showId = SelectLevelActivity.getHintSetting(getContext());	// 値を戻す
 			gameStatus = GameStatus.PLAYING;
 			DRAW_ALL = true;
 			invalidate();
