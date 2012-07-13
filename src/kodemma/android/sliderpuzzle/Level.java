@@ -23,8 +23,14 @@ public class Level {
 	public int tiles()		{ return small * large; }
 	public String text()	{ return small + " x " + large; }
 	public int score(long ms, int count) {
-		int time = (int)ms/1000;	// ミリ秒から秒へ変換
-		return (BONUS / count) * (tiles() * PANEL_VALUE) / time;
+		int score = 0;
+		try{
+			int time = (int)ms/1000;	// ミリ秒から秒へ変換　7/13　やめ
+			score = (int)((BONUS / count) * (tiles() * PANEL_VALUE) / time);
+		} catch (ArithmeticException e) {
+//			０除算は処理をせず強制的に０点。
+		}
+		return score;
 	}
 	@Override public String toString() {
 		return "small=" + small + ", large=" + large + ", level=" + level + ", tiles=" + tiles() + ", text=" + text();
