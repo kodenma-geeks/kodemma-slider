@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -21,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -265,5 +267,12 @@ public class SelectLevelActivity extends SharedMenuActivity {
 					.setPositiveButton(R.string.str_ok, null).show();
 		}
 		return bitmap;
+	}
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event){ //7.12ハードキーのバックキーを押された場合
+		if (keyCode == KeyEvent.KEYCODE_BACK){ //戻りボタンの処理
+			Toast.makeText(this, "Please press title button", Toast.LENGTH_SHORT).show();
+			return false;
+		}else{return super.onKeyDown(keyCode, event);}
 	}
 }

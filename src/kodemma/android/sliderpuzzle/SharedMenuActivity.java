@@ -6,6 +6,8 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -22,7 +24,10 @@ public class SharedMenuActivity extends Activity{
 	protected void killAllActivities() {
 		activities.remove(this);						// 全アクティビティリストから自身を除去する。
 		for (Activity a : activities) { a.finish(); }	// 自身以外の全アクティビティを終了する
-		finish();	
+		SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+		Editor e = pref.edit();
+		e.remove("uri");e.commit();
+		finish();
 	}
 	@Override public boolean onCreateOptionsMenu(Menu menu){
 		super.onCreateOptionsMenu(menu);

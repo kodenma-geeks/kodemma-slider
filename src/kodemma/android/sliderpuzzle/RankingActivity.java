@@ -1,7 +1,6 @@
 package kodemma.android.sliderpuzzle;
 
-import java.util.Date;
-import java.text.SimpleDateFormat;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -24,90 +23,90 @@ public class RankingActivity extends SharedMenuActivity{
 	private RankingOpenHelper dbHelper;
 	private SQLiteDatabase db;
 	private TableLayout tbLayout;
-	private int level;
+	private int level, lvlmode;
 	private String strlvl;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.rank);
+		
+		final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
 		level = SelectLevelActivity.getLevelSetting(this);
+		lvlmode = level;
 		strlvl = Level.get(level).text();
 		
 		tvRnk = (TextView) findViewById(R.id.textView_level);
 		tvRnk.setText("LEVEL "+strlvl);
-
 		ivTitle = (ImageButton) findViewById(R.id.imageButton_title);
 		ivUp = (ImageButton) findViewById(R.id.imageButton_levelup);
 		ivDown = (ImageButton) findViewById(R.id.imageButton_leveldown);
-
 		tbLayout = (TableLayout) findViewById(R.id.ranklist);
 
-		// データベースヘルパーのインスタンス生成
 		dbHelper = new RankingOpenHelper(this);
-		// データベースオブジェクトを取得する
 		db = dbHelper.getWritableDatabase();
-
 		db.beginTransaction();
 		
 		Bundle extras = getIntent().getExtras();
-		
-		if (extras != null) {
-			// データ受取処理
-			long timeKey = 0;
-			int countKey = 0;
-			timeKey = extras.getLong("Laptime");
-			countKey = extras.getInt("Slidecount");
-			
-//			Random rnd = new Random();
-//			int millisecond = rnd.nextInt(23605) + 1000;
-//			int handcnt = rnd.nextInt(10) + 1;
-			//Toast.makeText(this, "debug->"+Level.get(level).score(millisecond, handcnt), Toast.LENGTH_LONG).show();		
-//			Toast.makeText(this, "debug->"+strlvl, Toast.LENGTH_LONG).show();		
-			Toast.makeText(this, "debug time->"+timeKey+"count->"+countKey, Toast.LENGTH_LONG).show();		
-			Insert(timeKey, countKey, level);
+		if (extras != null) { // データ受取処理
+			long timeKey = extras.getLong("Laptime");
+			int countKey = extras.getInt("Slidecount");
+			Insert(timeKey, countKey, level); // Data Insert
+			int score = Level.get(level).score(timeKey, countKey);
+			String aaaa = getFormatTime(timeKey);
+//			alertDialogBuilder.setMessage("score:"+score+"\n"+"time:"+aaaa+"count:"+countKey);
+//			alertDialogBuilder.create().show();
+			Toast.makeText(getApplicationContext(), "score:"+score+"\n"+"time:"+aaaa, Toast.LENGTH_LONG).show();
 		}
-
-		// ～位以下削除
-		db.delete("ranking_table", "_id >= 100", null);
 		
+		db.delete("ranking_table", "_id >= 100", null); // ～位以下削除
 		db.setTransactionSuccessful();
 		db.endTransaction();
 
-		read(level);
-
-		// イベントリスナー登録
+		if(Level.min().level() < lvlmode || Level.max().level()> lvlmode){
+			if( Level.min().level() < lvlmode ){
+				strlvl = Level.get(lvlmode).text();
+				tvRnk.setText("LEVEL "+strlvl);
+				read(lvlmode);		// Data Select
+				ivDown.setEnabled(true);
+				ivUp.setEnabled(true);
+			}else{
+				strlvl = Level.get(lvlmode).text();
+				tvRnk.setText("LEVEL "+strlvl);
+				read(lvlmode);		// Data Select
+				ivDown.setEnabled(false);
+				ivUp.setEnabled(true);
+			}
+		}
+		
 		ivTitle.setOnClickListener(new ImgButtonsClickListener());
 		ivUp.setOnClickListener(new ImgButtonsClickListener());
 		ivDown.setOnClickListener(new ImgButtonsClickListener());
 	}
 
-	// ボタンクリックイベント
-	class ImgButtonsClickListener implements OnClickListener {
-
+	class ImgButtonsClickListener implements OnClickListener { // ボタンクリックイベント
 		public void onClick(View v) {
-			
-			int lvlmode = level;
-			
 			switch (v.getId()) {
 			case R.id.imageButton_title: // Title Activity Call.
+				
 				titleBack();break;
+				
 			case R.id.imageButton_leveldown: // Down Level expression
 
-				lvlmode = level-1;
+				lvlmode = lvlmode-1;
 				tbLayout.removeAllViews();
 				
-				Toast.makeText(getApplicationContext(), "Down level->"+level+"dede->"+lvlmode, Toast.LENGTH_LONG).show();
-				
-				if(Level.MIN < lvlmode || Level.MAX > lvlmode){
-					if( Level.MIN < lvlmode ){
+				if(Level.min().level() < lvlmode || Level.max().level()> lvlmode){
+					if( Level.min().level() < lvlmode ){
 						strlvl = Level.get(lvlmode).text();
 						tvRnk.setText("LEVEL "+strlvl);
 						read(lvlmode);
 						ivDown.setEnabled(true);
 						ivUp.setEnabled(true);
 					}else{
+						strlvl = Level.get(lvlmode).text();
+						tvRnk.setText("LEVEL "+strlvl);
+						read(lvlmode);
 						ivDown.setEnabled(false);
 						ivUp.setEnabled(true);
 					}
@@ -116,20 +115,20 @@ public class RankingActivity extends SharedMenuActivity{
 
 			case R.id.imageButton_levelup: // Up Level expression
 
-				lvlmode = level+1;
-
+				lvlmode = lvlmode+1;
 				tbLayout.removeAllViews();
 
-				Toast.makeText(getApplicationContext(), "Up level->"+level+"dede->"+lvlmode, Toast.LENGTH_LONG).show();
-				
-				if(Level.MIN < lvlmode || Level.MAX > lvlmode){
-					if( Level.MAX > lvlmode ){
+				if(Level.min().level()< lvlmode || Level.max().level()> lvlmode){
+					if( Level.max().level() > lvlmode ){
 						strlvl = Level.get(lvlmode).text();
 						tvRnk.setText("LEVEL "+strlvl);
 						read(lvlmode);
 						ivUp.setEnabled(true);
 						ivDown.setEnabled(true);
 					}else{
+						strlvl = Level.get(lvlmode).text();
+						tvRnk.setText("LEVEL "+strlvl);
+						read(lvlmode);
 						ivUp.setEnabled(false);
 						ivDown.setEnabled(true);
 					}
@@ -142,7 +141,6 @@ public class RankingActivity extends SharedMenuActivity{
 	private void read( Integer lvl ) { // Ranking Expression.
 		
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-
 		Cursor cursor = db.query("ranking_table", new String[] { "rank",
 				"score", "count", "time", "panels" }, "panels == ?",
 				new String[] { Integer.toString(lvl) }, null, null, "score desc");
@@ -150,7 +148,7 @@ public class RankingActivity extends SharedMenuActivity{
 		tbLayout.setStretchAllColumns(true);
 
 		TableRow headrow = new TableRow(RankingActivity.this);
-
+		
 		TextView rankHead = new TextView(RankingActivity.this);
 		rankHead.setGravity(Gravity.CENTER_HORIZONTAL);
 		rankHead.setText(R.string.rankID);
@@ -177,9 +175,8 @@ public class RankingActivity extends SharedMenuActivity{
 		int num = 1;
 		int opnRnk = 10;
 		while (cursor.moveToNext()) {
-
 			TableRow row = new TableRow(RankingActivity.this);
-
+			
 			TextView ranktxt = new TextView(RankingActivity.this);
 			ranktxt.setGravity(Gravity.CENTER_HORIZONTAL);
 //			ranktxt.setText(cursor.getString(0) + R.string.ranking_place);
@@ -218,9 +215,21 @@ public class RankingActivity extends SharedMenuActivity{
 			num++;
 			if(num > opnRnk){break;};
 		}
-		cursor.close(); // カーソルクローズ
+		cursor.close();
 	}
 
+	public void Insert(long time, int count, int level) {
+		ContentValues val = new ContentValues();
+		int score = Level.get(level).score(time, count);
+		
+		val.put("rank", 1); // Unused
+		val.put("score", score);
+		val.put("count", count);
+		val.put("time", getFormatTime(time));
+		val.put("panels", level);
+		db.insert("ranking_table", null, val);
+	}
+	
 	public void titleBack() {
 		Intent intent = new Intent();
 		intent.setClassName(getPackageName(), getPackageName() + ".TitleActivity");
@@ -228,30 +237,21 @@ public class RankingActivity extends SharedMenuActivity{
 		finish();
 	}
 
-	public void Insert(long time, int count, int level) {
-		ContentValues val = new ContentValues();
-		int score = Level.get(level).score(time, count);
-		SimpleDateFormat D = new SimpleDateFormat("mm:ss");
-		
-		val.put("rank", 1);
-		val.put("score", score);
-		val.put("count", count);
-		val.put("time", D.format(new Date(time)));
-		val.put("panels", level);
-		db.insert("ranking_table", null, val);
+	public boolean onKeyDown(int keyCode, KeyEvent event){ //7.12ハードキーのバックキーを押された場合
+		if (keyCode == KeyEvent.KEYCODE_BACK){ //戻りボタンの処理
+			Toast.makeText(this, "Please press title button", Toast.LENGTH_SHORT).show();
+			return false;
+		}else{return super.onKeyDown(keyCode, event);}
 	}
-	//7.12ハードキーのバックキーを押された場合
-	 public boolean onKeyDown(int keyCode, KeyEvent event)
-	 {
-		 //戻りボタンの処理
-       if (keyCode == KeyEvent.KEYCODE_BACK)
-       {
-    	   Toast.makeText(this, "Please press title button", Toast.LENGTH_SHORT).show();
-      	 	return false;
-       }
-       else
-       {
-           return super.onKeyDown(keyCode, event);
-       }
-	 }
+	
+	public String getFormatTime(long milliseconds){
+		long time = milliseconds;
+		time /= 1000;
+		long second = time % 60;
+		time /= 60;
+		long minute = time % 60;
+		long hour = time / 60;
+
+		return String.format("%02d:%02d:%02d", hour, minute, second);
+	}
 }
