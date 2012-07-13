@@ -165,7 +165,7 @@ public class Board {
 		Rect tmp = tile.dst;
 		tile.dst = hole.dst;
 		hole.dst = tmp;
-		slideCount++;
+//		slideCount++;
 	}
 	// タイルのスライドをアンドゥする
 	boolean undo() {
@@ -178,7 +178,7 @@ public class Board {
 		Rect tmp = undo.dst;
 		undo.dst = hole.dst;
 		hole.dst = tmp;
-		slideCount--;
+//		slideCount--;
 		return true;
 	}
 	// パズルが解かれたかどうか

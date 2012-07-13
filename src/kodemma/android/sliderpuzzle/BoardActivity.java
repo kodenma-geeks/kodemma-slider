@@ -8,6 +8,7 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -60,17 +61,6 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		switch(reqcode) {
 		case INTENT_FOR_SELECT_LEVEL:
 			if (result == RESULT_OK) {
-				
-//				int lv = (SelectLevelActivity.getLevelSetting(this)==0)? 1: SelectLevelActivity.getLevelSetting(this);
-//				boardView.level = Level.levels().get(lv);
-//				
-//				Uri u = SelectLevelActivity.getImgUriSetting(this);
-//				boardView.bitmap = boardView.setImgUriSetting(u, this);
-//				
-//				boardView.board.showId = SelectLevelActivity.getHintSetting(this);
-//				boardView.board.isGrid = SelectLevelActivity.getTileSetting(this);
-//				
-//				boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
 
 				//設定画面からの戻り修正　浜田　7/12				
 				isChange = false;
@@ -91,6 +81,8 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				boardView.board.border = boardView.board.getGrid(SelectLevelActivity.getTileSetting(this));
 //				boardView.invalidate();
 
+				SoundEffect.setSound_mute(SelectLevelActivity.getSoundSetting(this));// 7/13、追加 by 浜田
+				
 				if(isChange){//レベルか画像が変更された場合の処理
 					chronometer.timerStop();
 					buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
@@ -116,10 +108,16 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onGameSolved(int rows, int cols, int slides) {
 		// ここでランキング画面へ遷移する
-		Toast.makeText(this,"Congratulation!",Toast.LENGTH_LONG).show();	// クリア時に表示
+		Toast.makeText(this,(R.string.congratulation),Toast.LENGTH_LONG).show();	// クリア時に表示
+		try {
+		    Thread.sleep(2000); //2000ミリ秒Sleepする
+		} catch (InterruptedException e) {}
+
 		Intent it_for_ranking = new Intent(BoardActivity.this, RankingActivity.class);
 		it_for_ranking.putExtra("Laptime", PuzzleTimerTask.lapTime);
 		it_for_ranking.putExtra("Slidecount", slides);
+		Log.i("Laptime", Float.toString(PuzzleTimerTask.lapTime));
+		System.out.println("Slidecount "+ slides);
 		startActivity(it_for_ranking);
 		finish();
 	}
@@ -168,8 +166,8 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				oldLevel = boardView.level.level();	// 変更前の値を保存
 				oldUri = SelectLevelActivity.getImgUriSetting(BoardActivity.this);	// 変更前の値を保存
 
+				it_for_setting.putExtra("GAME", true);
 				startActivityForResult(it_for_setting, INTENT_FOR_SELECT_LEVEL);
-
 				break;
 			case R.id.board_button_title:
 				SoundEffect.getSound(SoundEffect.sound_Button_on);

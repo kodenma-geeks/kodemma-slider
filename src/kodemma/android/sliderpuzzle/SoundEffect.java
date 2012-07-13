@@ -13,10 +13,10 @@ public class SoundEffect {
 	static int sound_Button_off;
 	static int sound_solved;
 	
-	static boolean isSound_mute;
+	static boolean isSound;
 	
 	public static void setSound_mute(boolean sound) {
-		SoundEffect.isSound_mute = sound;
+		SoundEffect.isSound = sound;
 	}
 	//サウンドプールをロード
 	public static void soundLoad(Context cn){
@@ -39,7 +39,7 @@ public class SoundEffect {
 	}
 //効果音の再生タイミングで呼び出すメソッド
 	public static void getSound(int sound_source){
-		if(isSound_mute)return;
+		if(!isSound)return;
 		mSoundPool.play(sound_source, 0.3f, 0.3f, 1, 0, 1.0f);
 	}
 }

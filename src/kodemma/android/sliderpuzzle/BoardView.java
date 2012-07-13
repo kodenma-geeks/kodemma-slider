@@ -148,6 +148,7 @@ public class BoardView extends View implements AnimationListener {
 				break;
 			}
 			if (Utils.isSlided(vec, limiter)) {
+				board.slideCount++; // 浜田　まとめて動かしたときは１枚　7/13
 				for (Tile t : movables) board.slide(t);
 				boardViewListener.onTileSlided(board.slideCount);
 				if (board.solved()) {	// パズルが解かれた場合
@@ -175,7 +176,7 @@ public class BoardView extends View implements AnimationListener {
 	@Override protected void onDraw(Canvas canvas) {
 //		Log.d(TAG, "gameStatus=" + gameStatus + ", DRAW_ALL=" + DRAW_ALL);
 		if (gameStatus == GameStatus.SP_ENDED) {	// 浜田　7/12 追加
-			board.draw(canvas, movablesSet);	
+			board.draw(canvas, movablesSet);
 		} else if (gameStatus == GameStatus.SOLVED) {
 			board.draw(canvas, gameStatus, movablesSet);
 		} else {
