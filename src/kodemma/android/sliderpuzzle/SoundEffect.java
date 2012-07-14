@@ -1,46 +1,50 @@
 package kodemma.android.sliderpuzzle;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.util.Log;
 
 public class SoundEffect {
-	static SoundPool mSoundPool;
-//	static int sound_Touch;
-//	static int sound_Move;
-	static int sound_Up;
-	static int sound_Button_on;
-	static int sound_Button_off;
-	static int sound_solved;
+	private static SoundPool pool;
+	private static Map<Integer, Integer> effects = new HashMap<Integer, Integer>();
+	private static boolean isSound;
 	
-	static boolean isSound;
-	
-	public static void setSound_mute(boolean sound) {
-		SoundEffect.isSound = sound;
-	}
 	//サウンドプールをロード
-	public static void soundLoad(Context cn){
-		mSoundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
-//		sound_Touch = mSoundPool.load(cn, R.raw.switch_ti, 1);
-//		sound_Move = mSoundPool.load(this, R.raw., 1);
-		sound_Up = mSoundPool.load(cn, R.raw.switch_ti, 1);
-		sound_Button_on = mSoundPool.load(cn, R.raw.pipon, 1);
-		sound_Button_off = mSoundPool.load(cn, R.raw.popin, 1);
-		sound_solved = mSoundPool.load(cn, R.raw.turururu, 1);
+	public static void load(Context cn){
+		if (pool == null) {
+			pool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+			TypedArray tArray = cn.getResources().obtainTypedArray(R.array.effects);	
+
+			for (int i=0; i<tArray.length(); i++) {
+				int resId = tArray.getResourceId(i, 0);
+				int soundId = pool.load(cn, resId, 1);
+				effects.put(resId, soundId);
+			}
+		}
 	}
-	public static void soundStop(){
-//		mSoundPool.unload(sound_Touch);
-//		mSoundPool.unload(sound_Move);
-		mSoundPool.unload(sound_Up);
-		mSoundPool.unload(sound_Button_on);
-		mSoundPool.unload(sound_Button_off);
-		mSoundPool.unload(sound_solved);
-		mSoundPool.release();
+	public static void unload(){
+		if (pool != null) {
+			for (Integer e : effects.values()) { pool.unload(e); }
+			pool.release();
+			pool = null;
+		}
 	}
-//効果音の再生タイミングで呼び出すメソッド
-	public static void getSound(int sound_source){
-		if(!isSound)return;
-		mSoundPool.play(sound_source, 0.3f, 0.3f, 1, 0, 1.0f);
+	//効果音の再生タイミングで呼び出すメソッド
+	public static void getSound(int resId){
+		if (!isSound) return;
+		if (pool != null) {
+			int soundId = effects.get(resId);
+			pool.play(soundId, 0.3f, 0.3f, 1, 0, 1.0f);
+		}
+	}
+	public static void mute(boolean sound) {
+		SoundEffect.isSound = sound;
 	}
 }
 

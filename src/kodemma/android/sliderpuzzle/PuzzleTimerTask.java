@@ -63,6 +63,7 @@ public class PuzzleTimerTask extends TimerTask{
 			puzzleTimer.cancel();
 			puzzleTimer = null;
 			pauseTime = lapTime;
+			lapTime = 0;
 		}
 	}
 	public void timerResume(){
@@ -77,8 +78,14 @@ public class PuzzleTimerTask extends TimerTask{
 		if(puzzleTimer != null){
 			puzzleTimer.cancel();
 			puzzleTimer = null;
+			pauseTime = 0;
 			lapTime = 0;
 			displayed.setText(String.format("%02d:%02d:%02d", 0, 0, 0));
 		}
+	}
+	public void reset(){
+		pauseTime = 0;
+		lapTime = 0;
+		displayed.setText(String.format("%02d:%02d:%02d", 0, 0, 0));
 	}
 }

@@ -97,7 +97,7 @@ public class BoardView extends View implements AnimationListener {
 		bitmap = SelectLevelActivity.getBitmapSetting(context);
 //以上。　by shima
 		
-		SoundEffect.setSound_mute(SelectLevelActivity.getSoundSetting(context));
+		SoundEffect.mute(SelectLevelActivity.getSoundSetting(context));
 	}
 //	// Uriから画像をセットするメソッド
 //	protected Bitmap setImgUriSetting(Uri u, Context cn) {
@@ -159,7 +159,7 @@ public class BoardView extends View implements AnimationListener {
 			}
 //			SoundEffect.getSound(SoundEffect.sound_Up);
 			if(vec.x != 0 || vec.y != 0){	// 動かさなかった時は音を鳴らさない　7/10　浜田
-				SoundEffect.getSound(SoundEffect.sound_Up);
+				SoundEffect.getSound(R.raw.switch_ti);
 			}
 
 			DRAW_ALL = true; // 部分再描画：不具合対応-start
@@ -212,7 +212,7 @@ public class BoardView extends View implements AnimationListener {
 		splushFrameCounter = 0;
 		// アンドゥ時のアニメーションを執り行うハンドラを起動
 		new UndoHandler().start();
-		SoundEffect.getSound(SoundEffect.sound_solved);
+		SoundEffect.getSound(R.raw.switch_ti);
 	}
 	public void onUndoEnded() {
 //		gameStatus = GameStatus.PLAYING;
@@ -228,7 +228,7 @@ public class BoardView extends View implements AnimationListener {
 		splashMatrix = new Matrix();
 		// ゲーム完了時のスプラッシュアニメーションを執り行うハンドラを起動
 		new SplashHandler().start();
-		SoundEffect.getSound(SoundEffect.sound_solved);
+		SoundEffect.getSound(R.raw.turururu);
 	}
 	public void onSplashEnded() {
 		gameStatus = GameStatus.PLAYING;
@@ -317,7 +317,7 @@ public class BoardView extends View implements AnimationListener {
 			if (msg.what == INVALIDATE) {
 				gameStatus = GameStatus.SOLVED;
 				if (board.undo()) {
-					SoundEffect.getSound(SoundEffect.sound_Up);
+					SoundEffect.getSound(R.raw.switch_ti);
 					DRAW_ALL = true;
 					invalidate();
 					sendNextMessage();

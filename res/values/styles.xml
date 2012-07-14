@@ -2,7 +2,7 @@
 <resources>
 
     <style name="normalButton" parent="android:style/Widget.Button">
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:typeface">normal</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/green</item>

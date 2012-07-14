@@ -3,9 +3,11 @@ package kodemma.android.sliderpuzzle;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 public class TitleActivity extends SharedMenuActivity {
 //	GifView gifView;
@@ -64,5 +66,11 @@ public class TitleActivity extends SharedMenuActivity {
 			}
 		});
 
+	}
+	public boolean onKeyDown(int keyCode, KeyEvent event){ //7.12ハードキーのバックキーを押された場合
+		if (keyCode == KeyEvent.KEYCODE_BACK){ //戻りボタンの処理
+			Toast.makeText(this, "Please press somthing button", Toast.LENGTH_SHORT).show();
+			return false;
+		}else{return super.onKeyDown(keyCode, event);}
 	}
 }

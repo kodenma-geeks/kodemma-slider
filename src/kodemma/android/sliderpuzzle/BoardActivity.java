@@ -43,19 +43,23 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onResume(){
 		super.onResume();
-		SoundEffect.soundLoad(this);
+		SoundEffect.load(this);
 	}
 	public void onStop(){
 		super.onStop();
 		chronometer.timerPause();
-		SoundEffect.soundStop();
+		SoundEffect.unload();
 	}
 	public void onRestart(){
 		super.onRestart();
-		SoundEffect.soundLoad(this);
-		if(!isChange){
-			chronometer.timerResume();
-		}
+		SoundEffect.load(this);
+		if (stat == GameStatus.PAUSED){
+			chronometer.timerPause();
+		}else if (stat == GameStatus.PLAYING) {
+			if(!isChange){
+				chronometer.timerResume();
+			}
+	}
 	}
 	public void onActivityResult(int reqcode, int result, Intent it) {
 		switch(reqcode) {
@@ -81,9 +85,10 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				boardView.board.border = boardView.board.getGrid(SelectLevelActivity.getTileSetting(this));
 //				boardView.invalidate();
 
-				SoundEffect.setSound_mute(SelectLevelActivity.getSoundSetting(this));// 7/13、追加 by 浜田
+				SoundEffect.mute(SelectLevelActivity.getSoundSetting(this));// 7/13、追加 by 浜田
 				
 				if(isChange){//レベルか画像が変更された場合の処理
+					chronometer.reset();
 					chronometer.timerStop();
 					buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
 					boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
@@ -137,20 +142,20 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				buttonMap.get(R.id.board_button_start).setText(R.string.board_button_restart);
 				chronometer.timerStart();
 				backgroundView.shuffled(boardView.bitmap);
-				SoundEffect.getSound(SoundEffect.sound_Button_on);
+				SoundEffect.getSound(R.raw.pipon);
 				break;
 			case R.id.board_button_pause:
 				stat = boardView.pauseButtonPressed();
 				if (stat == GameStatus.PAUSED) {
 					buttonMap.get(R.id.board_button_pause).setText(R.string.board_button_resume);
-					SoundEffect.getSound(SoundEffect.sound_Button_on);
+					SoundEffect.getSound(R.raw.pipon);
 					chronometer.timerPause();
 					buttonMap.get(R.id.board_button_start).setEnabled(false);
 					buttonMap.get(R.id.board_button_setting).setEnabled(false);
 					buttonMap.get(R.id.board_button_title).setEnabled(false);
 				} else if (stat == GameStatus.PLAYING) {
 					buttonMap.get(R.id.board_button_pause).setText(R.string.board_button_pause);
-					SoundEffect.getSound(SoundEffect.sound_Button_off);
+					SoundEffect.getSound(R.raw.popin);
 					chronometer.timerResume();
 					buttonMap.get(R.id.board_button_start).setEnabled(true);
 					buttonMap.get(R.id.board_button_setting).setEnabled(true);
@@ -158,7 +163,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				}
 				break;
 			case R.id.board_button_setting:
-				SoundEffect.getSound(SoundEffect.sound_Button_on);
+				SoundEffect.getSound(R.raw.pipon);
 				Intent it_for_setting = new Intent(BoardActivity.this, SelectLevelActivity.class);
 
 				oldLevel = boardView.level.level();	// 変更前の値を保存
@@ -168,7 +173,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				startActivityForResult(it_for_setting, INTENT_FOR_SELECT_LEVEL);
 				break;
 			case R.id.board_button_title:
-				SoundEffect.getSound(SoundEffect.sound_Button_on);
+				SoundEffect.getSound(R.raw.pipon);
 				Intent it_for_title = new Intent(BoardActivity.this, TitleActivity.class);
 				startActivity(it_for_title);
 				
@@ -182,7 +187,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		 //戻りボタンの処理
         if (keyCode == KeyEvent.KEYCODE_BACK)
         {
-        	Toast.makeText(this, "Can not back", Toast.LENGTH_SHORT).show();
+        	Toast.makeText(this, "Can not return", Toast.LENGTH_SHORT).show();
        	 	return false;
         }
         else

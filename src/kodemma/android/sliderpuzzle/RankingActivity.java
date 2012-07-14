@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -19,7 +20,8 @@ import android.widget.Toast;
 public class RankingActivity extends SharedMenuActivity{
 
 	private TextView tvRnk;
-	private ImageButton ivTitle, ivUp, ivDown;
+	private ImageButton ivUp, ivDown;
+	private Button ivTitle;
 	private RankingOpenHelper dbHelper;
 	private SQLiteDatabase db;
 	private TableLayout tbLayout;
@@ -38,7 +40,7 @@ public class RankingActivity extends SharedMenuActivity{
 		
 		tvRnk = (TextView) findViewById(R.id.textView_level);
 		tvRnk.setText("LEVEL "+strlvl);
-		ivTitle = (ImageButton) findViewById(R.id.imageButton_title);
+		ivTitle = (Button) findViewById(R.id.ranking_button_title);
 		ivUp = (ImageButton) findViewById(R.id.imageButton_levelup);
 		ivDown = (ImageButton) findViewById(R.id.imageButton_leveldown);
 		tbLayout = (TableLayout) findViewById(R.id.ranklist);
@@ -87,7 +89,7 @@ public class RankingActivity extends SharedMenuActivity{
 	class ImgButtonsClickListener implements OnClickListener { // ボタンクリックイベント
 		public void onClick(View v) {
 			switch (v.getId()) {
-			case R.id.imageButton_title: // Title Activity Call.
+			case R.id.ranking_button_title: // Title Activity Call.
 				
 				titleBack();break;
 				

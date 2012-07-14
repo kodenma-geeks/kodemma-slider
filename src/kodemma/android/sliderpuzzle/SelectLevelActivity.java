@@ -271,7 +271,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	
 	public boolean onKeyDown(int keyCode, KeyEvent event){ //7.12ハードキーのバックキーを押された場合
 		if (keyCode == KeyEvent.KEYCODE_BACK){ //戻りボタンの処理
-			Toast.makeText(this, "Please press title button", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Please press somthing button", Toast.LENGTH_SHORT).show();
 			return false;
 		}else{return super.onKeyDown(keyCode, event);}
 	}
