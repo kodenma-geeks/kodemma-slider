@@ -9,7 +9,7 @@ public class PuzzleTimerTask extends TimerTask{
 
 	private PuzzleTimerTask timerTask;
 	private Timer puzzleTimer;
-	static long lapTime, startTime, pauseTime;
+	static long lapTime = 0, startTime = 0, pauseTime = 0;
 	TextView displayed;
 
 	final Handler hn = new Handler();
@@ -35,8 +35,7 @@ public class PuzzleTimerTask extends TimerTask{
 		        long minute = time % 60;
 		        long hour = time / 60;
 	
-				displayed.setText(String.format("%02d:%02d:%02d", hour, minute, second));
-				
+				displayed.setText(String.format("%02d:%02d:%02d", hour, minute, second));	
 			}
 		});
 	}
@@ -62,12 +61,11 @@ public class PuzzleTimerTask extends TimerTask{
 		if(puzzleTimer != null){
 			puzzleTimer.cancel();
 			puzzleTimer = null;
-			pauseTime = lapTime;
-			lapTime = 0;
 		}
 	}
 	public void timerResume(){
 		if(puzzleTimer == null){
+			pauseTime = lapTime;
 			timerTask = new PuzzleTimerTask(displayed);
 			puzzleTimer = new Timer(true);
 			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);

@@ -47,25 +47,25 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	}
 	public void onStop(){
 		super.onStop();
-		chronometer.timerPause();
+		chronometer.timerPause(); //プレイ画面が閉じられると一度タイマーをポーズ
 		SoundEffect.unload();
 	}
 	public void onRestart(){
 		super.onRestart();
 		SoundEffect.load(this);
-		if (stat == GameStatus.PAUSED){
-			chronometer.timerPause();
-		}else if (stat == GameStatus.PLAYING) {
-			if(!isChange){
-				chronometer.timerResume();
+		if (stat == GameStatus.PLAYING) { //プレイ画面が復帰した時に遷移前がプレイ中で
+			if(!isChange){ //設定画面のレベルと画像の設定変更がなされたわけではない場合
+				chronometer.timerResume(); //タイマーをリジューム
 			}
-	}
+		}
+		else if(stat != GameStatus.PAUSED){ //復帰したときに遷移前がポーズでなければ
+			chronometer.timerStop(); //タイマーをストップ
+		}
 	}
 	public void onActivityResult(int reqcode, int result, Intent it) {
 		switch(reqcode) {
 		case INTENT_FOR_SELECT_LEVEL:
 			if (result == RESULT_OK) {
-
 				//設定画面からの戻り修正　浜田　7/12				
 				isChange = false;
 				
@@ -87,14 +87,21 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 
 				SoundEffect.mute(SelectLevelActivity.getSoundSetting(this));// 7/13、追加 by 浜田
 				
-				if(isChange){//レベルか画像が変更された場合の処理
+				if(isChange){ //設定画面でレベルか画像が変更された場合の処理
 					chronometer.reset();
 					chronometer.timerStop();
 					buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
 					boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
 					boardView.gameStatus = GameStatus.WAITING;
-				}else{
-					chronometer.timerResume();					
+
+				}else{ //設定画面でレベルと画像の変更がなく
+					if(stat == GameStatus.PLAYING) { //遷移前がプレイ中であったら
+						chronometer.timerResume(); //タイマーはリジューム
+					}
+					else { //遷移前がプレイ中でなければ
+						chronometer.reset(); //タイマーをストップ
+						chronometer.timerStop();
+					}
 				}
 			}
 			break;
