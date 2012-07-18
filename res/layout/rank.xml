@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="fill_parent"
     android:orientation="vertical" >
 
     <ImageView
@@ -14,28 +14,23 @@
         android:id="@+id/textView_level"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="#ffffffff"
+       android:textSize="20dp"
+       android:layout_marginTop="5dp"
         android:gravity="center" />
 
     <ScrollView
         android:layout_width="fill_parent"
-        android:layout_height="280dp"
-        android:layout_marginTop="0dp" >
+        android:layout_height="fill_parent"
+        android:layout_weight="3"
+        android:layout_marginTop="5dp" >
 
         <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/ranklist"
-            android:orientation="vertical" >
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >   
 
-            
-           <!--  <TextView
-                android:id="@+id/textView_ranking"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="ランキング1位表示エリア" /> -->
-   
         </TableLayout>
     </ScrollView>
 
@@ -63,16 +58,15 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="right|bottom"
-        android:orientation="vertical" >
+        android:orientation="vertical" >
+
         <Button
             android:id="@+id/ranking_button_title"
             style="@style/normalButton"
-            android:layout_width="80dip"
+            android:layout_width="120dip"
             android:layout_height="wrap_content"
+            android:layout_marginRight="0dip"
             android:layout_weight="0.5"
-            android:layout_marginRight="30dip"
-            android:text="@string/board_button_title"/>
-
+            android:text="@string/board_button_title" />
     </LinearLayout>
-
-</LinearLayout>
+ </LinearLayout>

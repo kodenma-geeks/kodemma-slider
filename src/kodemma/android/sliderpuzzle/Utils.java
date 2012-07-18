@@ -18,13 +18,62 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 
-// 方向を表す列挙型
+/**
+* 方向を表す列挙型。
+* @author shimatani
+*
+*/
 enum Direction {
-	NONE, UP, DOWN, RIGHT, LEFT, OTHER;
+	/**
+	 * 無方向
+	 */
+	NONE, 
+	/**
+	 * 垂直上方向
+	 */
+	UP, 
+	/**
+	 * 垂直下方向
+	 */
+	DOWN, 
+	/**
+	 * 水平右方向
+	 */
+	RIGHT, 
+	/**
+	 * 水平左方向
+	 */
+	LEFT, 
+	/**
+	 * 他の方向
+	 */
+	OTHER;
+	/**
+	 * 垂直方向かどうかを取得する。
+	 * @return 垂直方向の場合はtrueを返す
+	 */
 	public boolean virtical() { return this == UP || this == DOWN; }
+	/**
+	 * 水平方向かどうかを取得する。
+	 * @return 水平方向の場合はtrueを返す
+	 */
 	public boolean horizontal() { return this == RIGHT || this == LEFT; }
+	/**
+	 * 無効な方向かどうかを取得する。
+	 * @return 無効な方向（無方向または他の方向）の場合はtrueを返す
+	 */
 	public boolean invalid() { return this == NONE || this == OTHER; }
+	/**
+	 * 有効な方向かどうかを取得する。
+	 * @return 無効な方向（無方向または他の方向）の場合はfalseを返す
+	 */
 	public boolean valid() { return !invalid(); }
+	/**
+	 * 始点から終点に向けての方向を取得する。
+	 * @return 始点から終点に向けての方向
+	 * @param sp 始点
+	 * @param ep 終点
+	 */
 	public static Direction direction(Point sp, Point ep) {	// 始点から終点への方向を取得する。 
 		int x = ep.x - sp.x; int y = ep.y - sp.y;
 		if (x == 0 && y == 0) return NONE;
@@ -33,16 +82,40 @@ enum Direction {
 		return OTHER;
 	}
 }
-// ユーティリティメソッドを集めたクラス 
+/**
+* ユーティリティメソッドを集めたクラス。
+* @author shimatani
+*
+*/
 public class Utils {
+	/**
+	 * 本アプリケーションのパッケージ名を表す文字列
+	 */
 	private static final String PACKAGE_NAME = Utils.class.getPackage().getName();
+	/**
+	 * androidリソースのUriスキームを表す文字列
+	 */
 	private static final String URI_SCHEME = "android.resource://";
-	
-	// 指定された確率（odds:0.0～1.0)のくじを引いて、当たればtrueが返る。
+	/**
+	 * 指定された確率（odds:0.0～1.0)のくじを引いた結果を取得する。
+	 * @param odds くじが当たる確率（odds:0.0～1.0)
+	 * @return　くじが当たった場合はtrueを返す。
+	 */
 	public static boolean lot(float odds) { return Math.random() < odds; }
-	// 指定されたIDのリソースを示すURIを取得する
+	/**
+	 * 指定されたIDのリソースを示すURIを取得する
+	 * @param resId リソースID
+	 * @return　該当リソースのURIを示す文字列。
+	 */
 	public static String getResourceUri(int resId) { return URI_SCHEME + PACKAGE_NAME + "/" + resId; }
-	// src矩形の全体を、縦横比を変えずに、dst矩形にフィットさせるためのマトリックスを計算する。
+	/**
+	 * src矩形の全体を、縦横比を変えずに、dst矩形にフィットさせるためのマトリックスを計算する。
+	 * @param srcWidth src矩形の幅
+	 * @param srcHeight src矩形の高さ
+	 * @param dstWidth 
+	 * @param dstHeight
+	 * @return
+	 */
 	public static Matrix adjustingMatrix(float srcWidth, float srcHeight, float dstWidth, float dstHeight) {
 		float scale;
 		float dx = 0f, dy = 0f;

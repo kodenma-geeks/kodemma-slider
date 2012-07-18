@@ -31,7 +31,7 @@
     <string name="txt_label_sound">SOUND</string>
     <string name="txt_btn_play">play</string>
     <string name="txt_btn_ranking">ranking</string>
-    <string name="txt_btn_exit">exit</string>
+    <string name="txt_btn_title">title</string>
 
     <!-- *** dialog message *** -->
     <string name="alart_title_failureInLoadingBitmap">Failure in Loading Bitmap</string>

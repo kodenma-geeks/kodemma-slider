@@ -26,7 +26,7 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	private Map<Integer, Button> buttonMap;
 	
 
-	GameStatus stat;	// 浜田　追記7/5
+//	GameStatus stat;	// 浜田　追記7/5
 	int oldLevel;	// 浜田　追記7/12
 	Uri oldUri;	// 浜田　追記7/12
 	boolean isChange;	// 浜田　追記7/12
@@ -53,13 +53,14 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 	public void onRestart(){
 		super.onRestart();
 		SoundEffect.load(this);
-		if (stat == GameStatus.PLAYING) { //プレイ画面が復帰した時に遷移前がプレイ中で
+		if (BoardView.gameStatus == GameStatus.PLAYING) { //プレイ画面が復帰した時に遷移前がプレイ中で
 			if(!isChange){ //設定画面のレベルと画像の設定変更がなされたわけではない場合
 				chronometer.timerResume(); //タイマーをリジューム
 			}
 		}
-		else if(stat != GameStatus.PAUSED){ //復帰したときに遷移前がポーズでなければ
+		else if(BoardView.gameStatus != GameStatus.PAUSED){ //復帰したときに遷移前がポーズでなければ
 			chronometer.timerStop(); //タイマーをストップ
+			chronometer.reset();
 		}
 	}
 	public void onActivityResult(int reqcode, int result, Intent it) {
@@ -88,19 +89,19 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				SoundEffect.mute(SelectLevelActivity.getSoundSetting(this));// 7/13、追加 by 浜田
 				
 				if(isChange){ //設定画面でレベルか画像が変更された場合の処理
-					chronometer.reset();
 					chronometer.timerStop();
+					chronometer.reset();
 					buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
 					boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
 					boardView.gameStatus = GameStatus.WAITING;
 
 				}else{ //設定画面でレベルと画像の変更がなく
-					if(stat == GameStatus.PLAYING) { //遷移前がプレイ中であったら
+					if(BoardView.gameStatus == GameStatus.PLAYING) { //遷移前がプレイ中であったら
 						chronometer.timerResume(); //タイマーはリジューム
 					}
 					else { //遷移前がプレイ中でなければ
-						chronometer.reset(); //タイマーをストップ
-						chronometer.timerStop();
+						chronometer.timerStop(); //タイマーをストップ
+						chronometer.reset();
 					}
 				}
 			}
@@ -152,15 +153,15 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				SoundEffect.getSound(R.raw.pipon);
 				break;
 			case R.id.board_button_pause:
-				stat = boardView.pauseButtonPressed();
-				if (stat == GameStatus.PAUSED) {
+				BoardView.gameStatus = boardView.pauseButtonPressed();
+				if (BoardView.gameStatus == GameStatus.PAUSED) {
 					buttonMap.get(R.id.board_button_pause).setText(R.string.board_button_resume);
 					SoundEffect.getSound(R.raw.pipon);
 					chronometer.timerPause();
 					buttonMap.get(R.id.board_button_start).setEnabled(false);
 					buttonMap.get(R.id.board_button_setting).setEnabled(false);
 					buttonMap.get(R.id.board_button_title).setEnabled(false);
-				} else if (stat == GameStatus.PLAYING) {
+				} else if (BoardView.gameStatus == GameStatus.PLAYING) {
 					buttonMap.get(R.id.board_button_pause).setText(R.string.board_button_pause);
 					SoundEffect.getSound(R.raw.popin);
 					chronometer.timerResume();

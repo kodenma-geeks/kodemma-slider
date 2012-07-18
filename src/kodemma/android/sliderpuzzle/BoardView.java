@@ -69,7 +69,7 @@ public class BoardView extends View implements AnimationListener {
 	Level level; // 浜田　7/5
 	private List<Tile> movables = new ArrayList<Tile>();	// スライドするタイル群
 	private Set<Tile> movablesSet = new HashSet<Tile>(); 
-	GameStatus gameStatus = GameStatus.WAITING;
+	static GameStatus gameStatus = GameStatus.WAITING;
 	BoardViewListener boardViewListener;
 	private AnimationListener splashListener = this;
 	private Matrix splashMatrix;
@@ -94,6 +94,8 @@ public class BoardView extends View implements AnimationListener {
 //		Uri u = SelectLevelActivity.getImgUriSetting(context);
 //		bitmap = setImgUriSetting(u, context);
 //以下、追加 by shima
+//		bitmap = SelectLevelActivity.getBitmapSetting(context);
+		SelectLevelActivity.setDefaultBitmapUriSetting(context);	// 7/18 追加
 		bitmap = SelectLevelActivity.getBitmapSetting(context);
 //以上。　by shima
 		

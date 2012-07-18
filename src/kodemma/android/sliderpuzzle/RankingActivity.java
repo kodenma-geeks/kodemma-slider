@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -20,26 +21,30 @@ import android.widget.Toast;
 public class RankingActivity extends SharedMenuActivity{
 
 	private TextView tvRnk;
-	private ImageButton ivUp, ivDown;
 	private Button ivTitle;
+	private ImageButton ivUp, ivDown;
 	private RankingOpenHelper dbHelper;
 	private SQLiteDatabase db;
 	private TableLayout tbLayout;
 	private int level, lvlmode;
 	private String strlvl;
+	private float first = 24;
+	private float second = 22;
+	private float third = 20;
+	private float normal = 18;
+	private long insid;
 
 	@Override public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.rank);
 		
-		final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
 		level = SelectLevelActivity.getLevelSetting(this);
 		lvlmode = level;
 		strlvl = Level.get(level).text();
 		
 		tvRnk = (TextView) findViewById(R.id.textView_level);
 		tvRnk.setText("LEVEL "+strlvl);
+		tvRnk.setTextSize(first);
 		ivTitle = (Button) findViewById(R.id.ranking_button_title);
 		ivUp = (ImageButton) findViewById(R.id.imageButton_levelup);
 		ivDown = (ImageButton) findViewById(R.id.imageButton_leveldown);
@@ -50,15 +55,18 @@ public class RankingActivity extends SharedMenuActivity{
 		db.beginTransaction();
 		
 		Bundle extras = getIntent().getExtras();
+		
 		if (extras != null) { // データ受取処理
 			long timeKey = extras.getLong("Laptime");
 			int countKey = extras.getInt("Slidecount");
 			Insert(timeKey, countKey, level); // Data Insert
 			int score = Level.get(level).score(timeKey, countKey);
-			String aaaa = getFormatTime(timeKey);
-//			alertDialogBuilder.setMessage("score:"+score+"\n"+"time:"+aaaa+"count:"+countKey);
-//			alertDialogBuilder.create().show();
-			Toast.makeText(getApplicationContext(), "score:"+score+"\n"+"time:"+aaaa, Toast.LENGTH_LONG).show();
+			String gettime = getFormatTime(timeKey);
+			// Ranking Dialog message
+			AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+			alertDialogBuilder.setTitle("Your Score")
+			.setMessage("score : "+score+"\ncount : "+countKey+"\ntime : "+gettime)
+			.setPositiveButton("OK",null).show();
 		}
 		
 		db.delete("ranking_table", "_id >= 100", null); // ～位以下削除
@@ -66,17 +74,26 @@ public class RankingActivity extends SharedMenuActivity{
 		db.endTransaction();
 
 		if(Level.min().level() < lvlmode || Level.max().level()> lvlmode){
-			if( Level.min().level() < lvlmode ){
+			if( Level.max().level() < lvlmode || lvlmode == 10){
 				strlvl = Level.get(lvlmode).text();
 				tvRnk.setText("LEVEL "+strlvl);
+				tvRnk.setTextSize(first);
 				read(lvlmode);		// Data Select
 				ivDown.setEnabled(true);
+				ivUp.setEnabled(false);
+			}else if( Level.min().level() > lvlmode || lvlmode == 1){
+				strlvl = Level.get(lvlmode).text();
+				tvRnk.setText("LEVEL "+strlvl);
+				tvRnk.setTextSize(first);
+				read(lvlmode);		// Data Select
+				ivDown.setEnabled(false);
 				ivUp.setEnabled(true);
 			}else{
 				strlvl = Level.get(lvlmode).text();
 				tvRnk.setText("LEVEL "+strlvl);
+				tvRnk.setTextSize(first);
 				read(lvlmode);		// Data Select
-				ivDown.setEnabled(false);
+				ivDown.setEnabled(true);
 				ivUp.setEnabled(true);
 			}
 		}
@@ -102,12 +119,14 @@ public class RankingActivity extends SharedMenuActivity{
 					if( Level.min().level() < lvlmode ){
 						strlvl = Level.get(lvlmode).text();
 						tvRnk.setText("LEVEL "+strlvl);
+						tvRnk.setTextSize(first);
 						read(lvlmode);
 						ivDown.setEnabled(true);
 						ivUp.setEnabled(true);
 					}else{
 						strlvl = Level.get(lvlmode).text();
 						tvRnk.setText("LEVEL "+strlvl);
+						tvRnk.setTextSize(first);
 						read(lvlmode);
 						ivDown.setEnabled(false);
 						ivUp.setEnabled(true);
@@ -124,12 +143,15 @@ public class RankingActivity extends SharedMenuActivity{
 					if( Level.max().level() > lvlmode ){
 						strlvl = Level.get(lvlmode).text();
 						tvRnk.setText("LEVEL "+strlvl);
+						tvRnk.setTextSize(first);
+						
 						read(lvlmode);
 						ivUp.setEnabled(true);
 						ivDown.setEnabled(true);
 					}else{
 						strlvl = Level.get(lvlmode).text();
 						tvRnk.setText("LEVEL "+strlvl);
+						tvRnk.setTextSize(first);
 						read(lvlmode);
 						ivUp.setEnabled(false);
 						ivDown.setEnabled(true);
@@ -140,10 +162,11 @@ public class RankingActivity extends SharedMenuActivity{
 		}
 	}
 
-	private void read( Integer lvl ) { // Ranking Expression.
 		
+	private void read( Integer lvl ) { // Ranking Expression.
+
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		Cursor cursor = db.query("ranking_table", new String[] { "rank",
+		Cursor cursor = db.query("ranking_table", new String[] {"_id", "rank",
 				"score", "count", "time", "panels" }, "panels == ?",
 				new String[] { Integer.toString(lvl) }, null, null, "score desc");
 
@@ -176,37 +199,44 @@ public class RankingActivity extends SharedMenuActivity{
 
 		int num = 1;
 		int opnRnk = 10;
+		int txtcolor = Color.WHITE;
+		float txtsize = normal;
+		
 		while (cursor.moveToNext()) {
+			long current_id = cursor.getLong(0) ;
+			if(current_id == insid){ txtcolor = Color.YELLOW; }else{ txtcolor = Color.WHITE; }
+			
 			TableRow row = new TableRow(RankingActivity.this);
+			
+			switch(num){
+			case 1:txtsize=first;break;
+			case 2:txtsize=second;break;
+			case 3:txtsize=third;break;
+			}
 			
 			TextView ranktxt = new TextView(RankingActivity.this);
 			ranktxt.setGravity(Gravity.CENTER_HORIZONTAL);
-//			ranktxt.setText(cursor.getString(0) + R.string.ranking_place);
 			ranktxt.setText(""+num);
-			if(num == 1){ranktxt.setTextSize(24.0f);}
-			else if(num == 2){ranktxt.setTextSize(22.0f);}
-			else if(num == 3){ranktxt.setTextSize(20.0f);}
+			ranktxt.setTextSize(txtsize);
+			ranktxt.setTextColor(txtcolor);
 
 			TextView scoretxt = new TextView(RankingActivity.this);
 			scoretxt.setGravity(Gravity.CENTER_HORIZONTAL);
-			scoretxt.setText(cursor.getString(1));
-			if(num == 1){scoretxt.setTextSize(24.0f);}
-			else if(num == 2){scoretxt.setTextSize(22.0f);}
-			else if(num == 3){scoretxt.setTextSize(20.0f);}
+			scoretxt.setText(cursor.getString(2));
+			scoretxt.setTextSize(txtsize);
+			scoretxt.setTextColor(txtcolor);
 				
 			TextView counttxt = new TextView(RankingActivity.this);
 			counttxt.setGravity(Gravity.CENTER_HORIZONTAL);
-			counttxt.setText(cursor.getString(2));
-			if(num == 1){counttxt.setTextSize(24.0f);}
-			else if(num == 2){counttxt.setTextSize(22.0f);}
-			else if(num == 3){counttxt.setTextSize(20.0f);}
+			counttxt.setText(cursor.getString(3));
+			counttxt.setTextSize(txtsize);
+			counttxt.setTextColor(txtcolor);
 
 			TextView timetxt = new TextView(RankingActivity.this);
 			timetxt.setGravity(Gravity.CENTER_HORIZONTAL);
-			timetxt.setText(cursor.getString(3));
-			if(num == 1){timetxt.setTextSize(24.0f);}
-			else if(num == 2){timetxt.setTextSize(22.0f);}
-			else if(num == 3){timetxt.setTextSize(20.0f);}
+			timetxt.setText(cursor.getString(4));
+			timetxt.setTextSize(txtsize);
+			timetxt.setTextColor(txtcolor);
 
 			row.addView(ranktxt);
 			row.addView(scoretxt);
@@ -229,7 +259,7 @@ public class RankingActivity extends SharedMenuActivity{
 		val.put("count", count);
 		val.put("time", getFormatTime(time));
 		val.put("panels", level);
-		db.insert("ranking_table", null, val);
+		insid = db.insert("ranking_table", null, val);
 	}
 	
 	public void titleBack() {

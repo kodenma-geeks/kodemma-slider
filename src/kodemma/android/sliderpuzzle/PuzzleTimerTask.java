@@ -5,6 +5,11 @@ import java.util.TimerTask;
 import android.os.Handler;
 import android.widget.TextView;
 
+/**
+ * プレイ画面のカウントタイマーを扱うクラス
+ * @author 島田
+ *
+ */
 public class PuzzleTimerTask extends TimerTask{
 
 	private PuzzleTimerTask timerTask;
@@ -18,7 +23,6 @@ public class PuzzleTimerTask extends TimerTask{
 		super();
 		displayed = disp;
 	}
-
 	public void run() {
 		hn.post(new Runnable() {
 			public void run() {
@@ -26,7 +30,6 @@ public class PuzzleTimerTask extends TimerTask{
 				long currentTime = System.currentTimeMillis();
 				lapTime = currentTime-startTime+pauseTime;
 				
-
 				//秒数を60で割って余りを秒数に表示、以下分と時間も同じ
 				long time = lapTime;
 				time /= 1000;
@@ -39,7 +42,12 @@ public class PuzzleTimerTask extends TimerTask{
 			}
 		});
 	}
-//スタート、リスタートごとにTimerTaskを生成（一度キャンセルして止めると再利用できない為）
+/**
+ * タイマーをスタートさせる（プレイ中のonClickでリスタートになりタイマーが0から再カウント）
+ * @author 島田
+ * @param なし
+ * @return なし
+ */
 	public void timerStart() {
 		startTime = System.currentTimeMillis();
 		if (puzzleTimer == null) {
@@ -57,12 +65,26 @@ public class PuzzleTimerTask extends TimerTask{
 			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
 		}
 	}
+/**
+ * タイマーをポーズする
+ * リジュームする可能性がある場合タイマーをポーズしてLapTimeを保持
+ * @author 島田
+ * @param なし
+ * @return なし
+ */
 	public void timerPause(){
 		if(puzzleTimer != null){
 			puzzleTimer.cancel();
 			puzzleTimer = null;
 		}
 	}
+/**
+ * タイマーをリジュームする
+ * ポーズで保持したLapTimeをPauseTimeとして加算してリジューム
+ * @author 島田
+ * @param なし
+ * @return なし
+ */
 	public void timerResume(){
 		if(puzzleTimer == null){
 			pauseTime = lapTime;
@@ -72,6 +94,13 @@ public class PuzzleTimerTask extends TimerTask{
 			startTime = System.currentTimeMillis();
 		}
 	}
+/**
+ * タイマーをストップする
+ * タイマーを停止しLapTime,PauseTimeを初期化
+ * @author 島田
+ * @param なし
+ * @return なし
+ */
 	public void timerStop(){
 		if(puzzleTimer != null){
 			puzzleTimer.cancel();
@@ -81,6 +110,13 @@ public class PuzzleTimerTask extends TimerTask{
 			displayed.setText(String.format("%02d:%02d:%02d", 0, 0, 0));
 		}
 	}
+/**
+ * タイマーをリセットする
+ * タイマーのスレッドが停止したのち再度LapTime,PauseTimeを初期化し、タイマー表示も初期状態に
+ * @author 島田
+ * @param なし
+ * @return なし
+ */
 	public void reset(){
 		pauseTime = 0;
 		lapTime = 0;

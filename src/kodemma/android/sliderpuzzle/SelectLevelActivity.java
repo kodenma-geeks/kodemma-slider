@@ -2,13 +2,14 @@ package kodemma.android.sliderpuzzle;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,15 +23,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class SelectLevelActivity extends SharedMenuActivity {
 
 	private static final int KDMA_SLIDE = 1;
-	private static final String DEFAULT_IMAGE_URI = Utils.getResourceUri(R.drawable.ic_launcher);
+	private static final String DEFAULT_IMAGE_URI = Utils.getResourceUri(R.drawable.kodenma);
 	private Spinner spnlvl; // Level setting
 	private CheckBox cbhint, cbtile, cbsound; // HINT, TILE, SOUND
 	private Button btnChoose, btnPlayActCall, btnRankingActCall,btnTitleActCall;
@@ -207,6 +208,15 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	public static Uri getImgUriSetting(Context context) {	// このメソッドは外部からは使用しない。代わりにBitmap getBitmapSetting()を使用するべし。
 		return Uri.parse(context.getSharedPreferences("pref", MODE_PRIVATE).getString("uri", DEFAULT_IMAGE_URI));
 	}
+	
+	// =================== preferences setter methods. ================= //
+	public static void setDefaultBitmapUriSetting(Context context) {	// 初期画像、デフォルト強制上書きメソッド
+		ContextWrapper cw = new ContextWrapper(context);
+		SharedPreferences pref = cw.getSharedPreferences("pref", MODE_PRIVATE);
+		Editor e = pref.edit();
+		e.putString("uri", DEFAULT_IMAGE_URI);e.commit();
+	}	
+	
 	// SharedPreferencesに保存されているURIからビットマップを読み込む。
 	// 読み込みに失敗した場合は、非常用ビットマップ（ドロイド君）を返す。（その際は、そのビットマップをSharedPreferencesに書き込む）
 	public static Bitmap getBitmapSetting(Context context) {
@@ -271,7 +281,7 @@ public class SelectLevelActivity extends SharedMenuActivity {
 	
 	public boolean onKeyDown(int keyCode, KeyEvent event){ //7.12ハードキーのバックキーを押された場合
 		if (keyCode == KeyEvent.KEYCODE_BACK){ //戻りボタンの処理
-			Toast.makeText(this, "Please press somthing button", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Please press title button", Toast.LENGTH_SHORT).show();
 			return false;
 		}else{return super.onKeyDown(keyCode, event);}
 	}

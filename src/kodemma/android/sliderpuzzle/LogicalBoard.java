@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.graphics.Point;
-import android.util.*;
-//enum Direction {UP, DOWN, LEFT, RIGHT, NON }; // Utilsへ移動 by shima
 
 class LogicalTile {
 	int serial;				// 実番号より１少ない連番（０スタート）
@@ -15,10 +13,16 @@ class LogicalTile {
 		this.lp.y = y;
 	}
 }
+
+/**
+ * シャッフルロジックなどのロジカルな処理
+ * @author hamada
+ * @version　1.01
+ */
 public class LogicalBoard {
 	private int row;
 	private int column;
-	int totalDistance;
+	protected int totalDistance;
 	LogicalTile[][] tiles;
 	LogicalTile hole;
 	private LogicalTile oldMove;			// 前回動かしたタイル
@@ -26,7 +30,6 @@ public class LogicalBoard {
 	private ArrayList<Point> recode;		// 棋譜
 	private int holeNumber;//shima
 
-	
     Direction direction;
 	
 	LogicalBoard(int r, int c){
@@ -58,19 +61,20 @@ public class LogicalBoard {
 			}
 		}
 	}
-	
+
+	/**
+	 * シャッフルロジックメソッド
+	 * @return　棋譜の配列の要素数（つまり手数）
+	 */
 	protected int shuffle() {
-		final float TWICE_VALUE = 2.0f;
-		final float LIMIT_VALUE = 5.5f;
+		final float TWICE_VALUE = 2.0f;	// 充分なシャッフルがなされるための値
+		final float LIMIT_VALUE = 2.7f;	// シャッフル制限のための値
 		
 		ArrayList<LogicalTile> tile;
 		
 		// シャッフル開始
 //		for (int i = 0; i < (int)(row * column * TWICE_VALUE * LIMIT_VALUE); i++) {
-		for (int i = 0; i < 3; i++) {
-
-			// 棋譜を一手追加
-//			recode.add(new Point(hole.lp.x, hole.lp.y)); // removed by shima
+		for (int i = 0; i < 3; i++){ 	// デバッグ用ループ
 
 			tile = canMoveTileSelect();
 			/*
@@ -86,9 +90,6 @@ public class LogicalBoard {
 
 			// 絞られた候補の中から、どのタイルを動かすかランダムで決定
 			newMove = tile.get((int) (Math.random() * tile.size()));
-
-				// デバッグ用
-//				debug(i,tile);
 			
 			// タイルを交換
 			slide(newMove);
@@ -98,13 +99,13 @@ public class LogicalBoard {
 				break;
 			}
 		}
-		// 棋譜に最後の一手を追加
-//		recode.add(new Point(hole.lp.x, hole.lp.y)); // removed by shima
-
 		return recode.size();
 	}
 
-	// 動かすことが可能な隣接タイルの番号を配列で返すメソッド
+	/**
+	 * 動かすことが可能な隣接タイルを配列で返す
+	 * @return 動かすことが可能な隣接タイルの配列
+	 */
 	protected ArrayList<LogicalTile> canMoveTileSelect() {
 
 		ArrayList<LogicalTile> canMoveTiles = new ArrayList<LogicalTile>();
@@ -124,39 +125,31 @@ public class LogicalBoard {
 		return canMoveTiles;
 	}
 
-	// 離散距離を求めるメソッド
-	public int getDistance(LogicalTile logTil) {
+	/**
+	 * 離散距離を求める
+	 * @param logTil　LogicalTile型クラスのタイル
+	 * @return 離散距離（縦座標のズレと横座標のズレの合計）
+	 */
+	protected int getDistance(LogicalTile logTil) {
 		int distnc = (Math.abs(logTil.serial / column - logTil.lp.y)		// 縦座標のズレ
 				   + (Math.abs(logTil.serial % column - logTil.lp.x)));		// 横座標のズレ
 		return distnc;
 	}
-	
-	
-	// 新メソッド　方向ゲット
+	/**
+	 * タイル移動方向の取得
+	 * @see   Utils.direction(Point sp, Point ep) 
+	 * @param logTil
+	 * @return　ENUM　{NONE, UP, DOWN, RIGHT, LEFT, OTHER}
+	 */
 	protected Direction getDirection(LogicalTile logTil) {
 		return Direction.direction(logTil.lp, hole.lp);
-		// 以下、を上記Directionのメソッドに委譲するようにした。
-//		direction = Direction.NONE;
-//		if (hole.lp.y == logTil.lp.y) {	// 上下に並んだ列の中から
-//			if (hole.lp.x > logTil.lp.x) {	// 左見て
-//				direction = Direction.RIGHT;
-//			}
-//			if (hole.lp.x < logTil.lp.x) {	// 右見て
-//				direction = Direction.LEFT;
-//			}
-//		}
-//		if (hole.lp.x == logTil.lp.x) {	// 左右に並んだ列の中から
-//			if (hole.lp.y > logTil.lp.y) {	// 上見て
-//				direction = Direction.DOWN;
-//			}
-//			if (hole.lp.y < logTil.lp.y) {	// 下見て
-//				direction = Direction.UP;
-//			}
-//		}
-//		return direction;	// デバッグ用に変数に入れてみたが、ifの中で直接returnしても良い
+		// メソッド内処理、を上記Directionのメソッドに委譲するようにした。
 	}
-	
-	// 新メソッド　動かせるタイルリスト
+	/**
+	 * 穴の場所から引数のタイルまでの動かせるタイルの配列取得
+	 * @param logTil
+	 * @return　穴から近い順のタイルの配列
+	 */
 	protected List<LogicalTile> getMovables(LogicalTile logTil) {
 		List<LogicalTile> ltList = null;
 
@@ -176,7 +169,12 @@ public class LogicalBoard {
 		}
 		return ltList;
 	}
-	// 新メソッド　隣接チェック　および　タイル入れ替え
+	/**
+	 * 隣接チェック
+	 * タイル入れ替え、及び離散度の更新
+	 * @param logTil
+	 * @return false:隣接しておらず　　true:入れ替え処理完了
+	 */
 	protected boolean slide(LogicalTile logTil) {
 		if ((hole.lp.x == logTil.lp.x && (Math.abs(hole.lp.y - logTil.lp.y) == 1))	 // 横または
 		  ||(hole.lp.y == logTil.lp.y && (Math.abs(hole.lp.x - logTil.lp.x) == 1))){ // 縦に隣接しているか？
@@ -203,7 +201,11 @@ public class LogicalBoard {
 		}
 		return false;
 	}
-	boolean undo() {
+	/**
+	 * 最後に移動したタイルを戻す
+	 * @return　false：これ以上戻せない　　true:一手戻す
+	 */
+	protected boolean undo() {
 		LogicalTile undo = getUndoTile();
 		if (undo == null) return false;
 		totalDistance -= getDistance(undo);	// 現状の離散度を減算
@@ -220,41 +222,23 @@ public class LogicalBoard {
 		recode.remove(recode.size() - 1);	// 棋譜から除去
 		return true;
 	}
-	// 最後に移動したタイルを取得
-	LogicalTile getUndoTile() {
+	/**
+	 * 最後に移動したタイルを取得
+	 * @return　タイル
+	 */
+	protected LogicalTile getUndoTile() {
 		int size = recode.size();
 		if (size < 2) return null;
 		Point p = recode.get(size - 2);
 		return tiles[p.x][p.y];
 	}
-	// 最後に移動したタイルをアンドゥする際の方向を取得する
-	Direction getUndoDirection() {
+	/**
+	 * 最後に移動したタイルをアンドゥする際の方向を取得する
+	 * @return ENUM
+	 */
+	protected Direction getUndoDirection() {
 		Point latest = getUndoTile().lp;
 		if (latest == null) return Direction.NONE;
 		return Direction.direction(latest, hole.lp);
-	}
-
-	// デバッグ用グリッド表示メソッド
-	private void debug(int i, ArrayList<LogicalTile> tile) {
-		System.out.println("\n"+ (i) + "回転");
-
-		if(i==0){
-			Log.i("holeNumber", Integer.toString(hole.serial +1));
-		}
-		for(int j = 0; j <tile.size();j++){
-			System.out.println("canMoveTile "+ (tile.get(j).serial +1));
-		}
-		System.out.println("Move serialNomber is " + (newMove.serial +1) + " to " + getDirection(newMove));
-
-		for (int k = 0; k < row; k++) {
-			for (int j = 0; j < column; j++) {
-				if(tiles[j][k].serial +1 < 10)System.out.print(" ");
-				System.out.print(" "+(tiles[j][k].serial +1));
-			}
-			System.out.print("\n");	
-		}
-		Log.i("moved", Integer.toString(newMove.serial +1));
-		Log.i("totalDistance", Integer.toString(totalDistance));
-		System.out.println("棋譜　X "+ hole.lp.x + ",  Y" + hole.lp.y);
 	}
 }
