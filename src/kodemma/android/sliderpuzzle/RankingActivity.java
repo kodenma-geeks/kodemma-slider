@@ -166,7 +166,7 @@ public class RankingActivity extends SharedMenuActivity{
 	private void read( Integer lvl ) { // Ranking Expression.
 
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		Cursor cursor = db.query("ranking_table", new String[] {"_id", "rank",
+		Cursor cursor = db.query("ranking_table", new String[] {"rowid", "rank",
 				"score", "count", "time", "panels" }, "panels == ?",
 				new String[] { Integer.toString(lvl) }, null, null, "score desc");
 
