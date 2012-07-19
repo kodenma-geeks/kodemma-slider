@@ -25,11 +25,11 @@ public class Level {
 	/** 
 	 * スコア計算の際、スコアを適切な範囲に収めるために使用する定数。
 	 */
-	private final int BONUS = 10000;
+	private final int BONUS = 100000;
 	/** 
 	 * スコア計算の際、パネル１枚ごとに与えられる点数。
 	 */
-	private final int PANEL_VALUE = 120;
+	private final int PANEL_VALUE = 256;
 	/** 
 	 * ゲーム盤の行数または列数のうち、小さいほうの値
 	 */
@@ -84,10 +84,19 @@ public class Level {
 	 */
 	public int score(long ms, int count) {
 		int score = 0;
+		int time = (int)ms/1000;	// ミリ秒から秒へ変換
+		int scoreValue = createLevels(MIN, MAX).size()+1 - level();	// スコアバリュー（例：最高レベルならば値は１）
 		try{
-			int time = (int)ms/1000;	// ミリ秒から秒へ変換　7/13　やめ
-			score = (int)((BONUS / count) * (tiles() * PANEL_VALUE) / time);
+//			score = (int)((BONUS / count) * (tiles() * PANEL_VALUE) / time);	// 古い式 
+
+			// 新しい、スコア算出式　7/19　 （０除算の可能性を考慮してtry-catch文）
+			score = (BONUS*level() / count) * ((tiles()+level())^2 * level() * PANEL_VALUE) / (time+scoreValue);
+			
+			// 不正スコア検査用のCheck Digit生成式　（１桁目は必ず意図した数字になる）
+			score = score*10 + level() - time/10;
+
 		} catch (ArithmeticException e) {
+			e.printStackTrace();
 //			０除算は処理をせず強制的に０点。
 		}
 		return score;

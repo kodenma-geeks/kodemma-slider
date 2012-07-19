@@ -279,11 +279,19 @@ public class RankingActivity extends SharedMenuActivity{
 	public String getFormatTime(long milliseconds){
 		long time = milliseconds;
 		time /= 1000;
-		long second = time % 60;
+		long sec = time % 60;
 		time /= 60;
-		long minute = time % 60;
+		long min = time % 60;
 		long hour = time / 60;
 
-		return String.format("%02d:%02d:%02d", hour, minute, second);
+		String fmt;	// １時間未満なら00:00　　１時間を超えたら00:00:00　で表示
+		if(hour == 0){
+			fmt = String.format("%02d:%02d", min, sec);
+		}else{
+			fmt = String.format("%d:%02d:%02d", hour, min, sec);
+		}
+		return fmt;
+		
+//		return hour == 0? String.format("%02d:%02d", min, sec): String.format("%d:%02d:%02d", hour, min, sec);
 	}
 }
