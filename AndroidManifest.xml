@@ -24,7 +24,7 @@
             android:name=".BoardActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".SelectLevelActivity"

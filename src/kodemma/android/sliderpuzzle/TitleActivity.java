@@ -37,24 +37,22 @@ public class TitleActivity extends SharedMenuActivity {
 
 		image1.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				 Intent intent = new Intent(TitleActivity.this,
-				 BoardActivity.class);
+				 Intent intent = new Intent(TitleActivity.this, BoardActivity.class);
+				 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				 startActivity(intent);
 				 finish();
 			}
 		});
 		image2.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				 Intent intent = new Intent(TitleActivity.this,
-				 RankingActivity.class);
+				 Intent intent = new Intent(TitleActivity.this, RankingActivity.class);
 				 startActivity(intent);
 				 finish();
 			}
 		});
 		image3.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				 Intent intent = new Intent(TitleActivity.this,
-				 SelectLevelActivity.class);
+				 Intent intent = new Intent(TitleActivity.this, SelectLevelActivity.class);
 				 startActivity(intent);
 				 finish();
 			}

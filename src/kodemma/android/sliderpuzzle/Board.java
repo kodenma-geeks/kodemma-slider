@@ -45,7 +45,7 @@ public class Board {
 	private LogicalBoard logicalBoard;			// 論理ゲーム盤
 	private Map<Point, Rect> dstRectsMap;		// タイルの論理位置と描画時の矩形のマッパー
 	private Map<LogicalTile, Tile> tilesMap;	// 論理タイルとタイルのマッパー
-	int slideCount = 0;							// ユーザのスライド回数
+	static int slideCount = 0;							// ユーザのスライド回数
 
 	Paint textPaint;							// タイル番号表示用(テキスト)
 	Paint tagPaint;								// タイル番号表示用(タグ)

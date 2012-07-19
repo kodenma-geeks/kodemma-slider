@@ -93,7 +93,7 @@ public class Level {
 			score = (BONUS*level() / count) * ((tiles()+level())^2 * level() * PANEL_VALUE) / (time+scoreValue);
 			
 			// 不正スコア検査用のCheck Digit生成式　（１桁目は必ず意図した数字になる）
-			score = score*10 + level() - time/10;
+			score = score*10 + level() - time%100/10;
 
 		} catch (ArithmeticException e) {
 			e.printStackTrace();

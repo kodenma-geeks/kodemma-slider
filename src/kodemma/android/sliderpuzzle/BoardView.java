@@ -155,6 +155,10 @@ public class BoardView extends View implements AnimationListener {
 				boardViewListener.onTileSlided(board.slideCount);
 				if (board.solved()) {	// パズルが解かれた場合
 					boardViewListener.onChronometerSwitched(false);
+					BoardActivity.buttonMap.get(R.id.board_button_start).setEnabled(false);
+					BoardActivity.buttonMap.get(R.id.board_button_pause).setEnabled(false);
+					BoardActivity.buttonMap.get(R.id.board_button_setting).setEnabled(false);
+					BoardActivity.buttonMap.get(R.id.board_button_title).setEnabled(false);
 //					splashListener.onSplashStarted();
 					splashListener.onUndoStarted();
 				}

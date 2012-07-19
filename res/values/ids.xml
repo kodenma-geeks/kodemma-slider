@@ -14,10 +14,10 @@
     </integer-array>
         <!-- 効果音の音源 -->
     <integer-array name="effects">
-        <item>@raw/pipon</item>
-        <item>@raw/popin</item>
+<!--    <item>@raw/pipon</item>
+        <item>@raw/popin</item>  -->
         <item>@raw/switch_ti</item>
-        <item>@raw/turi</item>
-        <item>@raw/turururu</item>
+<!--    <item>@raw/turi</item>
+        <item>@raw/turururu</item> -->
     </integer-array>
 </resources>
