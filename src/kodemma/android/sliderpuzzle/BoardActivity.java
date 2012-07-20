@@ -75,13 +75,14 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 		SoundEffect.mute(SelectLevelActivity.getSoundSetting(this));// 7/13、追加 by 浜田
 		
 		if(isChange){ //設定画面でレベルか画像が変更された場合の処理
-			chronometer.timerStop();
-			chronometer.reset();
-			buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
-			boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
-			boardView.gameStatus = GameStatus.WAITING;
-			buttonMap.get(R.id.board_button_pause).setEnabled(false);
-
+			if(BoardView.gameStatus != GameStatus.PAUSED){
+				chronometer.timerStop();
+				chronometer.reset();
+				buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
+				boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
+				boardView.gameStatus = GameStatus.WAITING;
+//				buttonMap.get(R.id.board_button_pause).setEnabled(false);
+			}
 		}else{ //設定画面でレベルと画像の変更がなく
 			buttonMap.get(R.id.board_button_start).setEnabled(true);
 			buttonMap.get(R.id.board_button_pause).setEnabled(true);
@@ -91,57 +92,14 @@ public class BoardActivity extends SharedMenuActivity implements BoardViewListen
 				chronometer.timerResume(); //タイマーはリジューム
 			}
 			else if(BoardView.gameStatus != GameStatus.PAUSED){ //復帰したときに遷移前がポーズでなければ
+				buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
 				chronometer.timerStop(); //タイマーをストップ
 				chronometer.reset();
 				Board.slideCount = 0;
 			}
 		}
 	}
-//	public void onActivityResult(int reqcode, int result, Intent it) {
-//		switch(reqcode) {
-//		case INTENT_FOR_SELECT_LEVEL:
-//			if (result == RESULT_OK) {
-//				//設定画面からの戻り修正　浜田　7/12				
-//				isChange = false;
-//				
-//				int lv = (SelectLevelActivity.getLevelSetting(this)==0)? 1: SelectLevelActivity.getLevelSetting(this);
-//				if(lv != oldLevel)isChange = true;
-//				boardView.level = Level.levels().get(lv);
-//				Uri u = SelectLevelActivity.getImgUriSetting(this);
-//				if(!u.equals(oldUri))isChange = true;
-//// 以下、削除 by shima				
-////				boardView.bitmap = boardView.setImgUriSetting(u, this);
-//// 以下、追加 by shima
-//				boardView.bitmap = SelectLevelActivity.getBitmapSetting(this);
-//// 以上。　by shima			
-//				
-//				boardView.board.showId = SelectLevelActivity.getHintSetting(this);
-//				boardView.board.isGrid = SelectLevelActivity.getTileSetting(this);
-//				boardView.board.border = boardView.board.getGrid(SelectLevelActivity.getTileSetting(this));
-////				boardView.invalidate();
-//
-//				SoundEffect.mute(SelectLevelActivity.getSoundSetting(this));// 7/13、追加 by 浜田
-//				
-//				if(isChange){ //設定画面でレベルか画像が変更された場合の処理
-//					chronometer.timerStop();
-//					chronometer.reset();
-//					buttonMap.get(R.id.board_button_start).setText(R.string.board_button_start);
-//					boardView.onSizeChanged(boardView.board.width,boardView.board.height,boardView.board.width,boardView.board.height);
-//					boardView.gameStatus = GameStatus.WAITING;
-//
-//				}else{ //設定画面でレベルと画像の変更がなく
-//					if(BoardView.gameStatus == GameStatus.PLAYING) { //遷移前がプレイ中であったら
-//						chronometer.timerResume(); //タイマーはリジューム
-//					}
-//					else { //遷移前がプレイ中でなければ
-//						chronometer.timerStop(); //タイマーをストップ
-//						chronometer.reset();
-//					}
-//				}
-//			}
-//			break;
-//		}
-//	}
+
 	public void onTileSlided(int count) {
 		slideCounterView.setText(String.valueOf(count));
 		backgroundView.slided();

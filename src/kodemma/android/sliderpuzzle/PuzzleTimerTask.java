@@ -51,19 +51,15 @@ public class PuzzleTimerTask extends TimerTask{
 	public void timerStart() {
 		startTime = System.currentTimeMillis();
 		if (puzzleTimer == null) {
-			pauseTime = 0;
-			lapTime = 0;
-			timerTask = new PuzzleTimerTask(displayed);
-			puzzleTimer = new Timer(true);
-			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
-		} else if (puzzleTimer != null) {
+
+		} else {
 			puzzleTimer.cancel();
-			pauseTime = 0;
-			lapTime = 0;
-			timerTask = new PuzzleTimerTask(displayed);
-			puzzleTimer = new Timer(true);
-			puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
 		}
+		pauseTime = 0;
+		lapTime = 0;
+		timerTask = new PuzzleTimerTask(displayed);
+		puzzleTimer = new Timer(true);
+		puzzleTimer.scheduleAtFixedRate(timerTask, 100, 100);
 	}
 /**
  * タイマーをポーズする
