@@ -68,35 +68,29 @@ public class RankingActivity extends SharedMenuActivity{
 			.setMessage("score : "+score+"\ncount : "+countKey+"\ntime : "+gettime)
 			.setPositiveButton("OK",null).show();
 		}
-		
-		db.delete("ranking_table", "_id >= 100", null); // ～位以下削除
+
+		String sqlstr = "delete from ranking_table where _id = (select _id from ranking_table group by panels having count(*) > 10 and min(score))";
+		db.execSQL(sqlstr);
 		db.setTransactionSuccessful();
 		db.endTransaction();
 
 		if(Level.min().level() < lvlmode || Level.max().level()> lvlmode){
-			if( Level.max().level() < lvlmode || lvlmode == 10){
-				strlvl = Level.get(lvlmode).text();
-				tvRnk.setText("LEVEL "+strlvl);
-				tvRnk.setTextSize(first);
-				read(lvlmode);		// Data Select
+			if( Level.max().level() <= lvlmode){
 				ivDown.setEnabled(true);
 				ivUp.setEnabled(false);
-			}else if( Level.min().level() > lvlmode || lvlmode == 1){
-				strlvl = Level.get(lvlmode).text();
-				tvRnk.setText("LEVEL "+strlvl);
-				tvRnk.setTextSize(first);
-				read(lvlmode);		// Data Select
+			}else if( Level.min().level() >= lvlmode){
 				ivDown.setEnabled(false);
 				ivUp.setEnabled(true);
 			}else{
-				strlvl = Level.get(lvlmode).text();
-				tvRnk.setText("LEVEL "+strlvl);
-				tvRnk.setTextSize(first);
-				read(lvlmode);		// Data Select
 				ivDown.setEnabled(true);
 				ivUp.setEnabled(true);
 			}
 		}
+		
+		strlvl = Level.get(lvlmode).text();
+		tvRnk.setText("LEVEL "+strlvl);
+		tvRnk.setTextSize(first);
+		read(lvlmode);		// Data Select
 		
 		ivTitle.setOnClickListener(new ImgButtonsClickListener());
 		ivUp.setOnClickListener(new ImgButtonsClickListener());
@@ -117,21 +111,18 @@ public class RankingActivity extends SharedMenuActivity{
 				
 				if(Level.min().level() < lvlmode || Level.max().level()> lvlmode){
 					if( Level.min().level() < lvlmode ){
-						strlvl = Level.get(lvlmode).text();
-						tvRnk.setText("LEVEL "+strlvl);
-						tvRnk.setTextSize(first);
-						read(lvlmode);
 						ivDown.setEnabled(true);
 						ivUp.setEnabled(true);
 					}else{
-						strlvl = Level.get(lvlmode).text();
-						tvRnk.setText("LEVEL "+strlvl);
-						tvRnk.setTextSize(first);
-						read(lvlmode);
 						ivDown.setEnabled(false);
 						ivUp.setEnabled(true);
 					}
 				}
+				strlvl = Level.get(lvlmode).text();
+				tvRnk.setText("LEVEL "+strlvl);
+				tvRnk.setTextSize(first);
+				read(lvlmode);
+				
 				break;
 
 			case R.id.imageButton_levelup: // Up Level expression
@@ -141,22 +132,18 @@ public class RankingActivity extends SharedMenuActivity{
 
 				if(Level.min().level()< lvlmode || Level.max().level()> lvlmode){
 					if( Level.max().level() > lvlmode ){
-						strlvl = Level.get(lvlmode).text();
-						tvRnk.setText("LEVEL "+strlvl);
-						tvRnk.setTextSize(first);
-						
-						read(lvlmode);
 						ivUp.setEnabled(true);
 						ivDown.setEnabled(true);
 					}else{
-						strlvl = Level.get(lvlmode).text();
-						tvRnk.setText("LEVEL "+strlvl);
-						tvRnk.setTextSize(first);
-						read(lvlmode);
 						ivUp.setEnabled(false);
 						ivDown.setEnabled(true);
 					}
 				}
+				strlvl = Level.get(lvlmode).text();
+				tvRnk.setText("LEVEL "+strlvl);
+				tvRnk.setTextSize(first);
+				read(lvlmode);
+				
 				break;
 			}
 		}
